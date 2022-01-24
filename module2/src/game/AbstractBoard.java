@@ -1,4 +1,4 @@
-package game;
+package src.game;
 
 public abstract class AbstractBoard implements Board{
     protected final int dim;
