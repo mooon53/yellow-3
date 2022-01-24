@@ -17,7 +17,7 @@ public abstract class Player {
         return this.name;
     }
     //@pure;
-    public Mark getHumanMark() {
+    public Mark getMark() {
         return this.mark;
     }
 
@@ -30,6 +30,6 @@ public abstract class Player {
 
     public void makeMove(Board board){
         int move = chooseMove(board);
-        board.setField(move, getHumanMark());
+        board.setField(move, getMark());
     }
 }

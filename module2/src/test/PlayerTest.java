@@ -1,6 +1,5 @@
 package src.test;
 
-import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import src.game.HumanPlayer;
 import src.game.Mark;
@@ -20,6 +19,6 @@ public class PlayerTest {
         mark = Mark.XX;
         player = new HumanPlayer(name, mark);
         assertEquals("player", player.getName());
-        assertEquals(Mark.XX, player.getHumanMark());
+        assertEquals(Mark.XX, player.getMark());
     }
 }

@@ -21,7 +21,7 @@ public class HumanPlayer extends Player {
      */
     @Override
     public int chooseMove(Board board) {
-         String prompt = "> "+ getName() + " ("+getHumanMark().toString()+") your turn: ";
+         String prompt = "> "+ getName() + " ("+ getMark().toString()+") your turn: ";
          System.out.println(prompt);
          //take input from user as index of tile
          int choice = scanner.nextInt();

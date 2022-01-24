@@ -104,4 +104,20 @@ public class GameBoard extends AbstractBoard{
             }
         }
     }
+
+    public void reset(){
+        for (int i = 0; i<DIM*DIM;i++){
+           setField(i,Mark.EMPTY);
+        }
+    }
+
+    public boolean isFull() {
+        boolean result = true;
+        for(int i = 0; i<DIM*DIM; i++){
+            if(getField(i).equals(Mark.EMPTY)){
+                result = false;
+            }
+        }
+        return result;
+    }
 }

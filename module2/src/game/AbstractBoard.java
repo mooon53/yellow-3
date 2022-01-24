@@ -1,7 +1,7 @@
 package src.game;
 
 public abstract class AbstractBoard implements Board{
-    protected final int dim;
+    public final int dim;
     protected Mark[] fields;
 
     public AbstractBoard(int dim) {
