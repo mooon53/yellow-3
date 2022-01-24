@@ -46,12 +46,12 @@ public class GameBoard extends AbstractBoard{
         return result;
     }
 
-    @Override
-    /*
+    /**
      * Sets a field to a mark, of both this board and the subBoard of the field.
      * @param i the index of the field to be changed.
      * @param mark the mark the field needs to be set to.
      */
+    @Override
     public void setField(int i, Mark mark) {
         int index = getSubBoard(i);
         int row = (i/DIM)%(DIM/2);

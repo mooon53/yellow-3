@@ -28,7 +28,6 @@ public class BoardTest {
                 index += 1;
             }
         }
-//        assertEquals(0, board.index(0, 0));
 //        assertEquals(1, board.index(0, 1));
 //        assertEquals(3, board.index(1, 0));
 //        assertEquals(8, board.index(2, 2));
