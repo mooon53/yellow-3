@@ -1,4 +1,4 @@
-package game;
+package src.game;
 
 public interface Board {
     int getIndex(int row, int col);

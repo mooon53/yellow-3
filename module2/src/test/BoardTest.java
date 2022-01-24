@@ -1,4 +1,4 @@
-package test;
+package src.test;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
-import game.GameBoard;
-import game.Mark;
+import src.game.GameBoard;
+import src.game.Mark;
 
 
 public class BoardTest {

@@ -1,4 +1,4 @@
-package game;
+package src.game;
 
 public class GameBoard extends AbstractBoard{
     /*@ public invariant fields.length == DIM*DIM;
@@ -47,7 +47,7 @@ public class GameBoard extends AbstractBoard{
     }
 
     @Override
-    /**
+    /*
      * Sets a field to a mark, of both this board and the subBoard of the field.
      * @param i the index of the field to be changed.
      * @param mark the mark the field needs to be set to.
