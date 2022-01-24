@@ -11,7 +11,7 @@ public class GameBoard extends AbstractBoard{
             " 30 | 31 | 32 | 33 | 34 | 35"};
 
     public final static int DIM = 6;
-    private SubBoard[] subBoards = new SubBoard[4];
+    public SubBoard[] subBoards = new SubBoard[4];
 
 
     /**
@@ -54,7 +54,10 @@ public class GameBoard extends AbstractBoard{
      */
     public void setField(int i, Mark mark) {
         int index = getSubBoard(i);
-        subBoards[index].setField(i, mark);
+        int row = (i/DIM)%(DIM/2);
+        int col = (i%DIM)%(DIM/2);
+        int j = subBoards[0].getIndex(row, col);
+        subBoards[index].setField(j, mark);
         fields[i] = mark;
     }
 
@@ -65,8 +68,8 @@ public class GameBoard extends AbstractBoard{
      */
     //@requires i >= 0 && i < 4;
     public void rotateRight(int i) {
-        int index = getSubBoard(i);
-        subBoards[index].rotateRight();
+        subBoards[i].rotateRight();
+        updateBoard(i);
     }
 
 
@@ -76,8 +79,7 @@ public class GameBoard extends AbstractBoard{
      */
     //@requires i >= 0 && i < 4;
     public void rotateLeft(int i) {
-        int index = getSubBoard(i);
-        subBoards[index].rotateLeft();
+        subBoards[i].rotateLeft();
         updateBoard(i);
     }
 

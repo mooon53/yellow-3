@@ -48,6 +48,10 @@ public class BoardTest {
         board.setField(0, Mark.XX);
         assertEquals(Mark.XX, board.getField(0));
         assertEquals(Mark.EMPTY, board.getField(1));
+
+        board.setField(8, Mark.XX);
+        assertEquals(Mark.XX, board.getField(8));
+        assertEquals(Mark.XX, board.subBoards[0].getField(5));
     }
 
 
@@ -60,8 +64,18 @@ public class BoardTest {
     }
 
     @Test
-    public void testRotateRight() {
-        board.rotateRight(1);
+    public void testRotate() {
+        board.setField(0, Mark.XX);
+        board.setField(8, Mark.XX);
+        board.setField(5, Mark.OO);
+        board.rotateRight(0);
+        assertEquals(Mark.XX, board.getField(2));
+        assertEquals(Mark.XX, board.getField(13));
+        assertEquals(Mark.OO, board.getField(5));
+        board.rotateLeft(1);
+        assertEquals(Mark.OO, board.getField(3));
+        assertEquals(Mark.XX, board.getField(2));
+        assertEquals(Mark.XX, board.getField(13));
     }
 }
 
