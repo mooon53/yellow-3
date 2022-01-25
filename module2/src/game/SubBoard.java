@@ -22,21 +22,11 @@ public class SubBoard extends AbstractBoard{
 
 
     /**
-     * Rotates the subBoard to the right
+     * Rotates the subBoard to the right for 90 degrees.
      */
+    //@ensures \old(fields[0]).equals(fields[2]);
     public void rotateRight(){
         Board copy = deepCopy();
-        /*//Hardcoding, change maybe?
-        fields[0] = copy.getField(2, 0);
-        fields[1] = copy.getField(1, 0);
-        fields[2] = copy.getField(0, 0);
-        fields[3] = copy.getField(2, 1);
-        fields[4] = copy.getField(1, 1);
-        fields[5] = copy.getField(0, 1);
-        fields[6] = copy.getField(2, 2);
-        fields[7] = copy.getField(1, 2);
-        fields[8] = copy.getField(0, 2);*/
-
         for(int i = 0; i < dim; i++)  {
             for(int j = 0; j < dim; j++) {
                 fields[getIndex(i , j)] = copy.getField(dim-1-j, i);
@@ -44,19 +34,12 @@ public class SubBoard extends AbstractBoard{
         }
     }
 
+    /**
+     * Rotates the subBoard to the left for 90 degrees.
+     */
+    //@ensures \old(fields[0]).equals(fields[6]);
     public void rotateLeft(){
         Board copy = deepCopy();
-        /*//Hardcoding, change maybe?
-        fields[0] = copy.getField(0,2);
-        fields[1] = copy.getField(1,2);
-        fields[2] = copy.getField(2,2);
-        fields[3] = copy.getField(0,1);
-        fields[4] = copy.getField(1,1);
-        fields[5] = copy.getField(2,1);
-        fields[6] = copy.getField(0,0);
-        fields[7] = copy.getField(1,0);
-        fields[8] = copy.getField(2,0);*/
-
         for(int i = 0; i < dim; i++)  {
             for(int j = 0; j < dim; j++) {
                 fields[getIndex(i , j)] = copy.getField(j, dim-1-i);

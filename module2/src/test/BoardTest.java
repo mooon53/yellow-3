@@ -71,11 +71,27 @@ public class BoardTest {
         assertEquals(Mark.XX, board.getField(2));
         assertEquals(Mark.XX, board.getField(13));
         assertEquals(Mark.OO, board.getField(5));
-        board.rotateLeft(1);
-        assertEquals(Mark.OO, board.getField(3));
+        board.rotateRight(1);
+        assertEquals(Mark.OO, board.getField(17));
         assertEquals(Mark.XX, board.getField(2));
         assertEquals(Mark.XX, board.getField(13));
     }
+
+    @Test
+    public void testRotateLeft() {
+        board.setField(29, Mark.XX);
+        board.setField(19, Mark.XX);
+        board.setField(5, Mark.OO);
+        board.rotateLeft(2);
+        assertEquals(Mark.OO, board.getField(5));
+        assertEquals(Mark.XX, board.getField(29));
+        assertEquals(Mark.XX, board.getField(24));
+        board.rotateLeft(3);
+        assertEquals(Mark.OO, board.getField(5));
+        assertEquals(Mark.XX, board.getField(22));
+        assertEquals(Mark.XX, board.getField(24));
+    }
+
 }
 
 
