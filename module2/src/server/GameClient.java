@@ -48,10 +48,24 @@ public class GameClient implements Client, Runnable{
                 writer.flush();
                 return true;
             } catch (IOException e) {
-                System.out.println("Something went wrong!");
+                System.out.println("Something went wrong with submitting move!");
                 close();
                 return false;
             }
+        }
+    }
+
+    @Override
+    public boolean sendUsername(String username) {
+        try {
+            writer.newLine();
+            writer.write(username);
+            writer.flush();
+            return true;
+        } catch (IOException e) {
+            System.out.println("Something went wrong with submitting username!");
+            close();
+            return false;
         }
     }
 
@@ -65,6 +79,7 @@ public class GameClient implements Client, Runnable{
                     continue;
                 }
                 System.out.println(line);
+                //print board state
             } catch (IOException e) {
                 System.out.println("Something went wrong with getting output from the server");
                 close();

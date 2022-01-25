@@ -20,9 +20,17 @@ public interface Client {
 
     /**
      * Sends a move of the player to the server
-     * @param index the index of the field selected
+     * @param index of the field selected
      * @return true on success, false on failure
      */
     boolean sendMove(int index);
+
+
+    /**
+     * Sends the username of the player to the server
+     * @param username of the user
+     * @return true on success, false on failure
+     */
+    boolean sendUsername(String username);
 
 }

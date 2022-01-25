@@ -1,6 +1,7 @@
 package src.server;
 
 
+
 import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -9,7 +10,7 @@ import java.util.List;
 
 public class GameServer implements Server, Runnable{
     protected int port;
-    private List<GameClientHandler> clients = new ArrayList<>();
+    private List<GameClientHandler> clients = new ArrayList<>(); //should only contain 2 clients
     private ServerSocket ss;
     private Socket socket;
 
@@ -26,15 +27,18 @@ public class GameServer implements Server, Runnable{
     @Override
     public void run() {
         try {
-            while(true){
+            int clientCounter = 0;
+            while(clientCounter<2){
                 this.socket = ss.accept();
                 System.out.println("Got connection from: "+ socket.getInetAddress());
-                var ch = new GameClientHandler();
+                var ch = new GameClientHandler(socket, this);
                 clients.add(ch);
                 new Thread(ch).start();
+                clientCounter++;
             }
+            //2 clients are found, game should be started now (TO DO)
         } catch (IOException e) {
-            System.out.println("Server/socket closed, program terminated");
+            System.out.println("Something went wrong with the server!");
         }
     }
 
@@ -56,4 +60,18 @@ public class GameServer implements Server, Runnable{
             System.out.println("Oops, something went wrong!");
         }
     }
+
+
+    /**
+     * Sends the move to the board, and notifies the clients
+     * @param index of the field on the board
+     */
+    //@requires index >= 0 && index < 36;
+    public void sendMove(int index) {
+        //send the move to the board (TO DO)
+        for(GameClientHandler client : clients){
+            client.printBoard();
+        }
+    }
+
 }
