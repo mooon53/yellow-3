@@ -190,38 +190,37 @@ public class GameBoard extends AbstractBoard{
                 counter2++;
             }
         }
-        return (counter1>=5) || (counter2>=5);
+        return (counter1>=DIM-1) || (counter2>=DIM-1);
 
     }
 
     public boolean winIrregularDiagonal(Mark mark){
-        boolean result = false;
         int counter1 = 0;
         int counter2 = 0;
-        int pair =0;
-        while(pair <DIM*DIM){
-            if(!(getField(pair).equals(mark)) && (pair != 0)){
-                break;
-            } else if(!(getField(pair).equals(mark)) && (pair == 0)){
-                pair++;
-            }else{
-                pair+=7;
+
+        //right irregular diagonal : starts from 1 or 6
+        for(int i = 1; i<DIM*DIM; i+=(DIM+1)){
+            if (getField(i).equals(mark)){
                 counter1++;
-            }
-        }
-        pair = 4;
-        while(pair < DIM*DIM){
-            if(!(getField(pair).equals(mark)) && (pair != 5)){
+            } else if(i ==1 && getField(i+(DIM-1)).equals(mark)){
+                counter1++;
+                i+=DIM-1;
+            } else{
                 break;
-            } else if(!(getField(pair).equals(mark)) && (pair == 5)){
-                pair++;
-            }else{
-                pair+=5;
+            }
+        }
+        //left irregular diagonal : starts from 4 or 11
+        for (int i = (DIM-2); i<DIM*DIM; i+=(DIM-1)){
+            if(getField(i).equals(mark)){
                 counter2++;
+            } else if (i==4 && getField(i+(DIM+1)).equals(mark)){
+                counter2++;
+                i+=DIM+1;
+            } else{
+                break;
             }
         }
 
-        return counter1 == 5 || counter2 == 5;
-
+        return counter1==5 || counter2==5;
     }
 }

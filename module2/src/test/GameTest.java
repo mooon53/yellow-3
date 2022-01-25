@@ -1,6 +1,7 @@
 package src.test;
 
 import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import src.game.*;
 
@@ -78,19 +79,36 @@ public class GameTest {
     }
 
     @Test
+    public void hasWinningLeftfDiagonal(){
+        board.setField(10,Mark.XX);
+        board.setField(15,Mark.XX);
+        board.setField(20,Mark.XX);
+        board.setField(25,Mark.XX);
+        //board.winDiagonal(Mark.XX);
+        assertFalse(board.winDiagonal(Mark.XX));
+        board.setField(30,Mark.XX);
+        board.winDiagonal(Mark.XX);
+        assertTrue(board.winDiagonal(Mark.XX));
+    }
+
+    @Test
     public void hasWinningIrrRightDiagonal(){
         board.setField(1,Mark.XX);
         board.setField(8,Mark.XX);
         board.setField(15,Mark.XX);
         board.setField(22,Mark.XX);
+        assertFalse(board.winIrregularDiagonal(Mark.XX));
+        board.setField(29,Mark.XX);
+        assertTrue(board.winIrregularDiagonal(Mark.XX));
 
+        board.reset();
+
+        board.setField(6,Mark.XX);
         board.setField(13,Mark.XX);
         board.setField(20,Mark.XX);
         board.setField(27,Mark.XX);
-        board.setField(34,Mark.XX);
         assertFalse(board.winIrregularDiagonal(Mark.XX));
-        board.setField(29,Mark.XX);
-        //board.winDiagonal(Mark.XX);
+        board.setField(34,Mark.XX);
         assertTrue(board.winIrregularDiagonal(Mark.XX));
     }
 
@@ -101,8 +119,21 @@ public class GameTest {
         board.setField(14,Mark.XX);
         board.setField(19,Mark.XX);
         assertFalse(board.winIrregularDiagonal(Mark.XX));
-        board.winIrregularDiagonal(Mark.XX);
         board.setField(24, Mark.XX);
         assertTrue(board.winIrregularDiagonal(Mark.XX));
+
+        board.reset();
+        board.setField(11,Mark.XX);
+        board.setField(16,Mark.XX);
+        board.setField(21,Mark.XX);
+        board.setField(26,Mark.XX);
+        assertFalse(board.winIrregularDiagonal(Mark.XX));
+        board.setField(31, Mark.XX);
+        board.winIrregularDiagonal(Mark.XX);
+        assertTrue(board.winIrregularDiagonal(Mark.XX));
+
+
+
     }
+
 }

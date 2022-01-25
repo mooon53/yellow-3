@@ -88,7 +88,7 @@ public class Game {
      */
     //@requires !candidate.equals(Mark.EMPTY);
     public boolean isWinner(Mark candidate){
-        return board.winLine(candidate) || board.winCol(candidate) || board.winDiagonal(candidate) || board.winIrregularDiagonal(candidate);
+        return board.winLine(candidate) || board.winCol(candidate) || board.winDiagonal(candidate) /* || board.winIrregularDiagonal(candidate)*/;
     }
 
 }
