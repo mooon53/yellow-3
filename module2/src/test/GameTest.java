@@ -93,12 +93,22 @@ public class GameTest {
 
     @Test
     public void hasWinningIrrRightDiagonal(){
-        board.setField(1,Mark.XX);
         board.setField(8,Mark.XX);
         board.setField(15,Mark.XX);
         board.setField(22,Mark.XX);
-        assertFalse(board.winIrregularDiagonal(Mark.XX));
         board.setField(29,Mark.XX);
+
+        board.setField(6,Mark.XX);
+        board.setField(13,Mark.XX);
+        board.setField(20,Mark.XX);
+        board.setField(27,Mark.XX);
+
+        assertFalse(board.winIrregularDiagonal(Mark.XX));
+
+        board.setField(1,Mark.OO);
+        assertFalse(board.winIrregularDiagonal(Mark.XX));
+
+        board.setField(34,Mark.XX);
         assertTrue(board.winIrregularDiagonal(Mark.XX));
 
         board.reset();

@@ -92,6 +92,15 @@ public class BoardTest {
         assertEquals(Mark.XX, board.getField(24));
     }
 
+
+    @Test
+    public void testString(){
+        board.setField(29, Mark.XX);
+        board.setField(19, Mark.XX);
+        board.setField(5, Mark.OO);
+        System.out.println(board.toString());
+    }
+
 }
 
 

@@ -5,12 +5,27 @@ public class GameBoard extends AbstractBoard{
         public invariant (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY || fields[i] == Mark.XX || fields[i] == Mark.OO);
     @*/
 
-    private static final String[] NUMBERING = {" 0 | 1 | 2 | 3 | 4 | 5 ", "---+---+---+---+---+---",
-            " 6 | 7 | 8 | 9 | 10 | 11 ", "---+---+---+---+---+---", " 12 | 13 | 14 | 15 | 16 | 17 ", "---+---+---+---+---+---",
-            " 18 | 19 | 20 | 21 | 22 | 23 ", "---+---+---+---+---+---" , " 24 | 25 | 26 | 27 | 28 | 29", "---+---+---+---+---+---",
-            " 30 | 31 | 32 | 33 | 34 | 35"};
-
     public final static int DIM = 6;
+    public final static String DELIM = "     ";
+    public final static String LINE = "---+---+---+---+---+---";
+    private static final String[] NUMBERING = {" 0 | 1 | 2 | 3 | 4 | 5 ", " 6 | 7 | 8 | 9 |10 |11 ",
+            "12 |13 |14 |15 |16 |17 ", "18 |19 |20 |21 |22 |23 ",
+            "24 |25 |26 |27 |28 |29 ", "30 |31 |32 |33 |34 |35 "};
+
+    /* Board should be shown as follows (with toString())
+     0 | 1 | 2 | 3 | 4 | 5
+    ---+---+---+---+---+---
+     6 | 7 | 8 | 9 |10 |11
+    ---+---+---+---+---+---
+    12 |13 |14 |15 |16 |17
+    ---+---+---+---+---+---
+    18 |19 |20 |21 |22 |23
+    ---+---+---+---+---+---
+    24 |25 |26 |27 |28 |29
+    ---+---+---+---+---+---
+    30 |31 |32 |33 |34 |35
+    */
+
     public SubBoard[] subBoards = new SubBoard[4];
 
 
@@ -197,7 +212,6 @@ public class GameBoard extends AbstractBoard{
     public boolean winIrregularDiagonal(Mark mark){
         int counter1 = 0;
         int counter2 = 0;
-
         //right irregular diagonal : starts from 1 or 6
         for(int i = 1; i<DIM*DIM; i+=(DIM+1)){
             if (getField(i).equals(mark)){
@@ -222,5 +236,26 @@ public class GameBoard extends AbstractBoard{
         }
 
         return counter1==5 || counter2==5;
+    }
+
+    /**
+     * Returns a String representation of the board, such that the state of the board and the indexes of the fields are clear.
+     */
+    public String toString() {
+        String s = "";
+        for (int i = 0; i < DIM; i++) {
+            String row = "";
+            for (int j = 0; j < DIM; j++) {
+                row = row + " " + getField(i, j).toString().substring(0, 1).replace("E", " ") + " ";
+                if (j < DIM - 1) {
+                    row = row + "|";
+                }
+            }
+            s = s + row + DELIM + NUMBERING[i];
+            if (i < DIM - 1) {
+                s = s + "\n" + LINE + DELIM + LINE + "\n";
+            }
+        }
+        return s;
     }
 }
