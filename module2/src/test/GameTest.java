@@ -101,6 +101,7 @@ public class GameTest {
         board.setField(14,Mark.XX);
         board.setField(19,Mark.XX);
         assertFalse(board.winIrregularDiagonal(Mark.XX));
+        board.winIrregularDiagonal(Mark.XX);
         board.setField(24, Mark.XX);
         assertTrue(board.winIrregularDiagonal(Mark.XX));
     }

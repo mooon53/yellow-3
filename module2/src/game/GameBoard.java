@@ -209,11 +209,11 @@ public class GameBoard extends AbstractBoard{
                 counter1++;
             }
         }
-        pair = 0;
-        while(pair <DIM*DIM){
+        pair = 4;
+        while(pair < DIM*DIM){
             if(!(getField(pair).equals(mark)) && (pair != 5)){
                 break;
-            } else if(!(getField(pair).equals(mark)) && (pair == 0)){
+            } else if(!(getField(pair).equals(mark)) && (pair == 5)){
                 pair++;
             }else{
                 pair+=5;
