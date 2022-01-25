@@ -120,4 +120,106 @@ public class GameBoard extends AbstractBoard{
         }
         return result;
     }
+    /**
+     * Check whether a given mark covers a line by winning conditions
+     * @param mark represents a mark to check
+     * @return true if there are 5 marks in a row
+     */
+    //@requires mark != Mark.EMPTY;
+    public boolean winLine(Mark mark){
+        boolean result = false;
+        int counter = 0;
+        for(int row=0; row<DIM; row++){
+            for(int col = 0; col< DIM; col++){
+                if (!(getField(row,col).equals(mark)) && col > 0){
+                    break;
+                } else if (getField(row,col).equals(mark)){
+                    counter++;
+                } else{
+                    continue;
+                }
+                if (counter==5){
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+
+    /**
+     * Check whether a given mark covers a column by winning conditions
+     *@param mark represents a mark to check
+     *@return true if there are 5 marks in a column
+     */
+    public boolean winCol (Mark mark){
+        boolean result = false;
+        int counter = 0;
+        for(int col=0; col<DIM; col++){
+            for(int row = 0; row< DIM; row++){
+                if (!(getField(row,col).equals(mark)) && row > 0){
+                    break;
+                } else if (getField(row,col).equals(mark)){
+                    counter++;
+                } else{
+                    continue;
+                }
+                if (counter==5){
+                    result = true;
+                }
+            }
+        }
+        return result;
+    }
+
+    public boolean winDiagonal(Mark mark){
+        int counter1 = 0;
+        int counter2 = 0;
+        for (int pair = 0; pair<DIM; pair+=1){
+            if(!getField(pair,pair).equals(mark) && pair > 0){
+                break;
+            } else if (getField(pair,pair).equals(mark)){
+                counter1++;
+            }
+        }
+        for (int pair = 0; pair<DIM; pair+=1){
+            if(!getField((DIM-1-pair),pair).equals(mark) && pair>0){
+                break;
+            } else if (getField((DIM-1-pair),pair).equals(mark)){
+                counter2++;
+            }
+        }
+        return (counter1>=5) || (counter2>=5);
+
+    }
+
+    public boolean winIrregularDiagonal(Mark mark){
+        boolean result = false;
+        int counter1 = 0;
+        int counter2 = 0;
+        int pair =0;
+        while(pair <DIM*DIM){
+            if(!(getField(pair).equals(mark)) && (pair != 0)){
+                break;
+            } else if(!(getField(pair).equals(mark)) && (pair == 0)){
+                pair++;
+            }else{
+                pair+=7;
+                counter1++;
+            }
+        }
+        pair = 0;
+        while(pair <DIM*DIM){
+            if(!(getField(pair).equals(mark)) && (pair != 5)){
+                break;
+            } else if(!(getField(pair).equals(mark)) && (pair == 0)){
+                pair++;
+            }else{
+                pair+=5;
+                counter2++;
+            }
+        }
+
+        return counter1 == 5 || counter2 == 5;
+
+    }
 }

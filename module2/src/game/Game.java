@@ -88,31 +88,7 @@ public class Game {
      */
     //@requires !candidate.equals(Mark.EMPTY);
     public boolean isWinner(Mark candidate){
-        if(winLine(candidate)) /*|| winCol(candidate) || winDiagLeft(candidate) ||winDiagRight(candidate))*/{
-            return true;
-        } else {
-            return false;
-        }
+        return board.winLine(candidate) || board.winCol(candidate) || board.winDiagonal(candidate) || board.winIrregularDiagonal(candidate);
     }
 
-    /**
-     * Check whether a given mark covers a line by winning conditions
-     * @param mark represents a mark to check
-     * @return true if there are 5 marks in a row
-     */
-    private boolean winLine(Mark mark){
-        boolean result = false;
-        for(int row=0; row< board.dim; row++){
-            for(int col = 0; col< board.dim; col++){
-                if(board.getField(row,col)!=mark && col != 1){
-                    break;
-                }
-                if (col== board.dim-1){
-                    result = true;
-
-                }
-            }
-        }
-        return result;
-    }
 }
