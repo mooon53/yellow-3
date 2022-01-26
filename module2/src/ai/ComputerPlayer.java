@@ -1,5 +1,6 @@
 package src.ai;
 
+import src.game.Player;
 import src.game.*;
 
 public class ComputerPlayer extends Player {

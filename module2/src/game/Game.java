@@ -2,8 +2,6 @@ package src.game;
 
 import java.util.Scanner;
 
-import static src.game.GameBoard.DIM;
-
 public class Game {
     public static final int NUMBER_OF_PLAYERS = 2;
     private GameBoard board;

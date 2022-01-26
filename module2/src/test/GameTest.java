@@ -1,8 +1,8 @@
 package src.test;
 
 import org.junit.jupiter.api.BeforeEach;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
+import src.game.Player;
 import src.game.*;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -15,8 +15,8 @@ public class GameTest {
 
     @BeforeEach
     public void setup(){
-        player1 = new HumanPlayer("player1", Mark.XX);
-        player2 = new HumanPlayer("player2", Mark.OO);
+        player1 = new HumanPlayer("player1");
+        player2 = new HumanPlayer("player2");
         board = new GameBoard();
         game = new Game(player1, player2);
     }

@@ -1,14 +1,14 @@
 package src.game;
 
+import src.game.GameBoard;
+import src.game.Mark;
+
 public abstract class Player {
     private String name; //name of the HumanPlayer
-    private Mark mark; //represents mark assigned to a player
-
-
+    private Mark mark;
     //creates new Player object
-    public Player(String name, Mark mark){
+    public Player(String name){
         this.name = name;
-        this.mark = mark;
     }
 
     //default getters
@@ -16,10 +16,14 @@ public abstract class Player {
     public String getName() {
         return this.name;
     }
-    //@pure;
-    public Mark getMark() {
+
+
+    public abstract Mark assignMark();
+
+    public Mark getMark(){
         return this.mark;
     }
+
 
     /**
      * Assigns the following move of Player
@@ -49,4 +53,10 @@ public abstract class Player {
         }
         board.setField(move, getMark());
     }
+
+    /**
+     * creates a client of game server
+     */
+    protected abstract void connectToServer();
+
 }
