@@ -6,7 +6,7 @@ import src.game.Mark;
 
 public class BasicStrategy implements Strategy{ //NEEDS TO BE TESTED
     //A strategy that selects winning moves, and prevents winning moves of the opponent
-    //However this AI can still create winning moves for the opponent by rotating the wrong thing
+    //Is still easy to win against, because you often have multiple winning moves at the same time
     private DumbStrategy random = new DumbStrategy();
 
     @Override
@@ -60,7 +60,7 @@ public class BasicStrategy implements Strategy{ //NEEDS TO BE TESTED
                         GameBoard copy2 = (GameBoard) board.deepCopy();
                         if (copy2.getField(n) == Mark.EMPTY) {
                             copy2.setField(n, mark.other());
-                            if (m/4 == 1) { //rotate to the left if j > 3
+                            if (m/4 == 1) { //rotate to the left if m > 3
                                 copy.rotateLeft(m%4);
                             } else { //else, rotate to the right
                                 copy.rotateRight(m);
@@ -79,11 +79,28 @@ public class BasicStrategy implements Strategy{ //NEEDS TO BE TESTED
 
         //if opponent can win with a move, prevent that
         move = determineWinningMove(board, mark.other());
+        int index;
         if (move != null) {
-            return move;
+            index = move[0]; //we have found a field that we need to place a piece on to prevent the opponent from winning
+        } else {
+            index = random.determineMove(board, mark)[0]; //there is no winning move for the opponent, so we select a random field
         }
+        //we also don't want to create a winning move for our opponent by rotating a board
+        //so next, we want to determine a rotation so our opponent cannot win
+        for (int j = 0; j < 8; j++) { //see if the opponent can win if we do this rotation
+            GameBoard copy = (GameBoard) board.deepCopy();
+            copy.setField(index, mark);
+            if (j/4 == 1) { //rotate to the left if j > 3
+                copy.rotateLeft(j%4);
+            } else { //else, rotate to the right
+                copy.rotateRight(j);
+            }
+            if (determineWinningMove(board, mark.other()) == null) {//Conclusion: the opponent cannot win if we do this rotation
+                return new int[]{index, j};
+            }
+        } //if this for loop finishes without returning anything, we have lost
 
-        //if there isn't a direct way to win or prevent a win, return a random move
-        return new DumbStrategy().determineMove(board, mark);
+        //if there isn't a way to prevent the opponent from winning, just return a random move
+        return random.determineMove(board, mark);
     }
 }
