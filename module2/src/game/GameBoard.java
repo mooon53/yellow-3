@@ -78,6 +78,22 @@ public class GameBoard extends AbstractBoard{
 
 
     /**
+     * Creates a deepCopy of this GameBoard, with the subBoards also copied over
+     * @return the copied board
+     */
+    //@ensures (\forall int i; i>= 0 && i < 4;\result.subBoards[i] != this.subBoards[i]);
+    //@ensures (\forall int i; i>= 0 && i < 4; (\forall int j; (j >= 0 && j < dim*dim); \result.subBoards[i].fields[j] == this.subBoards[i].fields[j]));
+    @Override
+    public GameBoard deepCopy() {
+        GameBoard copyBoard = new GameBoard();
+        for (int i = 0; i < fields.length; i++) {
+            copyBoard.setField(i, this.getField(i));
+        }
+        return copyBoard;
+    }
+
+
+    /**
      * Rotates the given subBoard to the right
      * @param i the index of the subBoard
      */

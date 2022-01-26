@@ -8,12 +8,8 @@ public class SubBoard extends AbstractBoard{
 
 
 
-    /**
-     * Creates a deep copy of this subBoard.
-     */
-    //@ensures \result != this;
-    //@ensures (\forall int i; (i >= 0 && i < dim*dim); \result.fields[i] == this.fields[i]);
-    //@pure;
+
+    @Override
     public SubBoard deepCopy() {
         SubBoard copyBoard = new SubBoard(dim);
         System.arraycopy(this.fields, 0, copyBoard.fields, 0, dim * dim);

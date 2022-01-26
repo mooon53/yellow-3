@@ -11,5 +11,5 @@ public interface Board {
 
     void setField(int i, Mark mark);
 
-
+    Board deepCopy();
 }

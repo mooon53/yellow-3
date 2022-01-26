@@ -58,6 +58,14 @@ public abstract class AbstractBoard implements Board{
     public void setField(int i, Mark mark) {
         fields[i] = mark;
     }
+
+    /**
+     * Creates a deep copy of this board.
+     */
+    //@ensures \result != this;
+    //@ensures (\forall int i; (i >= 0 && i < dim*dim); \result.fields[i] == this.fields[i]);
+    //@pure;
+    public abstract AbstractBoard deepCopy();
 }
 
 
