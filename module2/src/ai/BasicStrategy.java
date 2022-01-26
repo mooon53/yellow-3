@@ -100,7 +100,7 @@ public class BasicStrategy implements Strategy{ //NEEDS TO BE TESTED
             }
         } //if this for loop finishes without returning anything, we have lost
 
-        //if there isn't a way to prevent the opponent from winning, just return a random move
-        return random.determineMove(board, mark);
+        //if there isn't a way to prevent the opponent from winning, use 0 as rotation
+        return new int[]{index, 0};
     }
 }
