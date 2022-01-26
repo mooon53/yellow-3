@@ -111,6 +111,8 @@ public class HumanPlayer extends Player{
                 this.username = getName();
                 writer.write(username);
                 writer.flush();
+                playerID = Integer.parseInt(String.valueOf(reader.read()));
+                System.out.println("assigned as: "+playerID);
             } catch (IOException e) {
                 System.out.println("Unable to create client.");
             }
