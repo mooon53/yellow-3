@@ -89,7 +89,7 @@ public class HumanPlayer extends Player{
         } catch (UnknownHostException e) {
             System.out.println("Unknown host.");
         } catch (IOException e) {
-            System.out.println("This game is already full. Please, choose another port.");
+            System.out.println("This game is already full or does not exist. Please, choose another port.");
         }
     }
 
@@ -112,7 +112,7 @@ public class HumanPlayer extends Player{
                 writer.write(username);
                 writer.flush();
                 playerID = Integer.parseInt(String.valueOf(reader.read()));
-                System.out.println("assigned as: "+playerID);
+                System.out.println("Your mark is: "+assignMark().toString());
             } catch (IOException e) {
                 System.out.println("Unable to create client.");
             }
