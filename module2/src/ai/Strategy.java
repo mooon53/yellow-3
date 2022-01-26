@@ -13,9 +13,10 @@ public interface Strategy {
 
     /**
      * Determines the next move according to the strategy used
+     * The first index of the array will be the move, the second the rotation
      * @param board the current board state
      * @param mark the mark that the player uses
-     * @return a valid move (which should be determined according to the strategy)
+     * @return an array of integers, with the first being the index of the field, the second the integer for the rotation
      */
-    int determineMove(Board board, Mark mark);
+    int[] determineMove(Board board, Mark mark);
 }

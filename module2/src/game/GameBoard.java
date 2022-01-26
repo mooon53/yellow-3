@@ -274,4 +274,14 @@ public class GameBoard extends AbstractBoard{
         }
         return s;
     }
+
+    /**
+     * Checks if a Mark (that isn't Mark.EMPTY) fulfills a win-condition.
+     * @param candidate represents the mark of player
+     * @return true if one of players is a winner in either direction
+     */
+    //@requires !candidate.equals(Mark.EMPTY);
+    public boolean isWinner(Mark candidate){
+        return winLine(candidate) || winCol(candidate) || winDiagonal(candidate) || winIrregularDiagonal(candidate);
+    }
 }

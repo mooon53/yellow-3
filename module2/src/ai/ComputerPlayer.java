@@ -4,6 +4,7 @@ import src.game.*;
 
 public class ComputerPlayer extends Player {
     private Strategy strategy;
+    private int[] moveList;
 
     public ComputerPlayer(Strategy strategy, Mark mark) {
         super(strategy.getName() + "-" + mark.name(), mark);
@@ -12,12 +13,15 @@ public class ComputerPlayer extends Player {
 
     @Override
     public int chooseMove(GameBoard board) {
-        return strategy.determineMove(board, this.getMark());
+        moveList = strategy.determineMove(board, this.getMark());
+        return moveList[0];
     }
+
 
     @Override
     public int chooseRotation(GameBoard board) {
-        return 0;
+        //since chooseMove is called first in the makeMove method, this works
+        return moveList[1];
     }
 
     //@pure;
