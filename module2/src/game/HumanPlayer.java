@@ -109,8 +109,8 @@ public class HumanPlayer extends Player{
                 this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
                 this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
                 this.username = getName();
-                playerID = Integer.parseInt(reader.readLine());
-                assignMark();
+                writer.write(username);
+                writer.flush();
             } catch (IOException e) {
                 System.out.println("Unable to create client.");
             }
