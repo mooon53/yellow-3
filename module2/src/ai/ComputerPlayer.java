@@ -11,8 +11,13 @@ public class ComputerPlayer extends Player {
     }
 
     @Override
-    public int chooseMove(Board board) {
+    public int chooseMove(GameBoard board) {
         return strategy.determineMove(board, this.getMark());
+    }
+
+    @Override
+    public int chooseRotation(GameBoard board) {
+        return 0;
     }
 
     //@pure;
