@@ -27,19 +27,23 @@ public class GameClient extends Thread {
 
     Scanner scanner = new Scanner(System.in);
 
-    public GameClient(int level) {
+    public GameClient(int level, int port) {
         this.board = new GameBoard();
-        if(level ==1){
-            Strategy strategy = new BasicStrategy();
-            this.player = new ComputerPlayer(strategy);
-        } else if(level == 2){
-            Strategy strategy = new DumbStrategy();
-            this.player = new ComputerPlayer(strategy);
-        } else{
-            setUsername();
-            this.player = new HumanPlayer(this.username);
+        try {
+            socket = new Socket("localhost",port);
+            if(level ==1){
+                Strategy strategy = new BasicStrategy();
+                this.player = new ComputerPlayer(strategy);
+            } else if(level == 2){
+                Strategy strategy = new DumbStrategy();
+                this.player = new ComputerPlayer(strategy);
+            } else{
+                setUsername();
+                this.player = new HumanPlayer(this.username);
+            }
+        } catch (IOException e) {
+            System.out.println("Unable to join port.");
         }
-        connectGame();
     }
 
     //getters
@@ -73,20 +77,6 @@ public class GameClient extends Thread {
     public void setUsername(){
         System.out.println("Enter your username: ");
         this.username = scanner.nextLine();
-    }
-    public void connectGame(){
-        try {
-            System.out.println("Join port: ");
-            int port = scanner.nextInt();
-            Socket socket = new Socket("localhost", port);
-            System.out.println("Choose game:\n 0: multiplayer\n 1: single (easy)\n 2: single(medium)");
-            int level = scanner.nextInt();
-            new GameClient(level);
-        } catch (UnknownHostException e) {
-            System.out.println("Unknown host.");
-        } catch (IOException e) {
-            System.out.println("This game is already full or does not exist. Please, choose another port.");
-        }
     }
 
     public void run(){

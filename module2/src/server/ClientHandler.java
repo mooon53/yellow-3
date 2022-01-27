@@ -1,71 +1,77 @@
 package src.server;
 
 
+
+import src.game.Mark;
+
 import java.io.*;
 import java.net.Socket;
-import java.nio.CharBuffer;
-import java.util.ArrayList;
 
-public class ClientHandler implements Runnable {
+public class ClientHandler extends Thread {
+    private GameServer server;
     private Socket socket;
-    private Server server;
+    private String username;
+    private Mark mark;
+    private Game game;
     private BufferedReader reader;
     private BufferedWriter writer;
-    private int playerID;
-    private String username;
 
-
-    public ArrayList<ClientHandler> clientHandlers = new ArrayList<>();
-
-
-    public ClientHandler(Socket socket, Server server, int playerID) {
+    public ClientHandler(Socket socket, GameServer server) {
         try {
             this.socket = socket;
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.server = server;
             this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
-            this.playerID = playerID;
-            clientHandlers.add(this);
         } catch (IOException e) {
             close();
         }
     }
 
-    @Override
-    public void run() {
-        try {
-            writer.write(playerID);
-            writer.flush();
-            //game connection
+    //getters
 
-        } catch (IOException e) {
-            close();
+    //@pure;
+    public String getUsername() {
+        return username;
+    }
+
+    //@pure;
+    public Game getGame() {
+        return game;
+    }
+
+    //@pure;
+    public Mark getMark() {
+        return mark;
+    }
+
+    //queries
+    public void connect(String username) {
+        if (username != null) {
+            this.username = username;
+            System.out.println("New player connected");
         }
     }
 
-    public void announceMessage(String message) {
-        for (ClientHandler clientHandler : clientHandlers) {
-            try {
-                if (clientHandler.playerID != playerID) {
-                    clientHandler.writer.write(message);
-                    clientHandler.writer.newLine();
-                    clientHandler.writer.flush();
-                }
-            } catch (IOException e) {
-                close();
-            }
-        }
+    public void play() {
+        server.createGame(this);
     }
 
-    public void removeClientHandler() {
-        clientHandlers.remove(this);
-        announceMessage("" + playerID + " left game.");
+    public void makeMove(int index) {
+
+    }
+
+    public void setMark(int index) {
+        if (index == 0) {
+            this.mark = Mark.XX;
+        } else {
+            this.mark = Mark.OO;
+        }
+
     }
 
     public void close() {
         try {
             if (socket != null && reader != null && writer != null) {
-                removeClientHandler();
                 socket.close();
                 reader.close();
                 writer.close();
@@ -75,4 +81,5 @@ public class ClientHandler implements Runnable {
         }
 
     }
+
 }

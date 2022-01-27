@@ -1,25 +1,26 @@
 package src.ai;
 
+
+import src.game.Board;
+import src.game.GameBoard;
+import src.game.Mark;
 import src.game.Player;
-import src.game.*;
 
 public class ComputerPlayer extends Player {
     private Strategy strategy;
     private int[] moveList;
 
-    public ComputerPlayer(Strategy strategy, Mark mark) {
-        super(strategy.getName() + "-" + mark.name(), mark);
+    public ComputerPlayer(Strategy strategy) {
+        super(strategy.getName() + "-");
         this.strategy = strategy;
     }
 
     @Override
-    public int chooseMove(GameBoard board) {
-        moveList = strategy.determineMove(board, this.getMark());
-        return moveList[0];
+    public void chooseMove(Board board) {
+        moveList = strategy.determineMove(board, Mark.XX);
     }
 
 
-    @Override
     public int chooseRotation(GameBoard board) {
         //since chooseMove is called first in the makeMove method, this works
         return moveList[1];
@@ -29,4 +30,5 @@ public class ComputerPlayer extends Player {
     public Strategy getStrategy() {
         return strategy;
     }
+
 }

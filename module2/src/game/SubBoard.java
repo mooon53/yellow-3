@@ -1,6 +1,6 @@
 package src.game;
 
-public class SubBoard extends AbstractBoard{
+public class SubBoard extends AbstractBoard {
 
     public SubBoard(int DIM) {
         super(DIM);
