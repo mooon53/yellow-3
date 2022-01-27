@@ -67,5 +67,3 @@ public abstract class AbstractBoard implements Board{
     //@pure;
     public abstract AbstractBoard deepCopy();
 }
-
-

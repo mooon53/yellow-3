@@ -4,6 +4,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import src.game.Player;
 import src.game.*;
+import src.server.Game;
 
 import static org.junit.jupiter.api.Assertions.*;
 

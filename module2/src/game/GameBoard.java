@@ -1,8 +1,8 @@
 package src.game;
 
 public class GameBoard extends AbstractBoard{
-    /*@ public invariant fields.length == DIM*DIM;
-        public invariant (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY || fields[i] == Mark.XX || fields[i] == Mark.OO);
+    /*public invariant fields.length == DIM*DIM;
+    public invariant (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY || fields[i] == Mark.XX || fields[i] == Mark.OO);
     @*/
 
     public final static int DIM = 6;
@@ -138,7 +138,7 @@ public class GameBoard extends AbstractBoard{
 
     public void reset(){
         for (int i = 0; i<DIM*DIM;i++){
-           setField(i,Mark.EMPTY);
+            setField(i,Mark.EMPTY);
         }
     }
 
@@ -284,4 +284,5 @@ public class GameBoard extends AbstractBoard{
     public boolean isWinner(Mark candidate){
         return winLine(candidate) || winCol(candidate) || winDiagonal(candidate) || winIrregularDiagonal(candidate);
     }
+
 }
