@@ -86,7 +86,8 @@ public class Logic extends Thread {
                     case MOVE:
                         int move = Integer.parseInt((String) decode.get(1));
                         int rotation = Integer.parseInt((String) decode.get(2));
-                        clientHandler.makeMove(move);
+                        int size = Integer.parseInt((String) decode.get(3));
+                        clientHandler.makeMove(move, rotation, size);
                         break;
                     case GAMEOVER:
                         clientHandler.getGame().gameOver();

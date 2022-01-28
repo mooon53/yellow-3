@@ -103,11 +103,7 @@ public class Protocol {
     }
 
 
-    public static String join(String username){
-        return protocolMessage(new Object[] {CommandsIdentifier.LOGIN, username});
-    }
-
-    public static String greeting(String[] params ){
+   public static String greeting(String[] params ){
         if (params != null){
             return protocolMessage(new Object[]{CommandsIdentifier.HELLO, params});
         }
@@ -124,6 +120,10 @@ public class Protocol {
        return CommandsIdentifier.ERROR.toString();
     }
 
+    public static String error (String message){
+        return error(new String[]{message});
+    }
+
     public static String error(){
         return error((String[]) null);
     }
@@ -135,8 +135,8 @@ public class Protocol {
     public static String login(String username){
         return protocolMessage(new Object[]{CommandsIdentifier.LOGIN, username});
     }
-    public static String move(int index, int rotation){
-        return protocolMessage(new Object[]{CommandsIdentifier.MOVE, index, rotation});
+    public static String move(int index, int rotation, int side){
+        return protocolMessage(new Object[]{CommandsIdentifier.MOVE, index, rotation, side});
     }
     public static String gameover(String reason){
         return protocolMessage(new Object[]{CommandsIdentifier.GAMEOVER, reason});

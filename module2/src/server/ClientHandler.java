@@ -1,7 +1,7 @@
 package src.server;
 
 
-
+import src.Protocol;
 import src.game.GameBoard;
 import src.game.Mark;
 
@@ -47,14 +47,17 @@ public class ClientHandler extends Thread {
     public Mark getMark() {
         return mark;
     }
+
     //@pure;
     public Socket getSocket() {
         return this.socket;
     }
+
     //@pure;
     public Thread getLogic() {
         return logic;
     }
+
     //@pure;
     public GameServer getServer() {
         return server;
@@ -66,13 +69,14 @@ public class ClientHandler extends Thread {
             this.username = username;
             String msg = "New player connected";
             this.announce(msg);
-        } else{
+        } else {
             String msg = "Invalid username.";
             this.announce(msg);
         }
     }
-    public void announce(String msg){
-        if(this.writer != null){
+
+    public void announce(String msg) {
+        if (this.writer != null) {
             try {
                 this.writer.write(msg);
                 this.writer.flush();
@@ -86,11 +90,16 @@ public class ClientHandler extends Thread {
         server.createGame(this);
     }
 
-    public void makeMove(int index) {
-        if(this.game.gameOver() == false){
+    public void makeMove(int index, int rotation, int side) {
+        if (this.game.gameOver() == false) {
             int player = this.game.getIndexOfCurrentPlayer();
             GameBoard currentBoard = this.game.getBoard();
             currentBoard.setField(index, getMark());
+            if (side == 0) {
+                this.game.getBoard().rotateRight(rotation);
+            } else if(side == 1){
+                this.game.getBoard().rotateLeft(rotation);
+            }
             this.game.next();
         }
 
@@ -107,7 +116,6 @@ public class ClientHandler extends Thread {
     }
 
 
-
     public void close() {
         try {
             if (socket != null && reader != null && writer != null) {
@@ -121,7 +129,18 @@ public class ClientHandler extends Thread {
 
     }
 
-    public void run(){
+    public void sendMessage(String messsage) {
+        if (this.writer != null) {
+            try {
+                this.writer.write(messsage);
+                this.writer.flush();
+            } catch (IOException e) {
+                System.out.println(Protocol.error());
+            }
+        }
+    }
+
+    public void run() {
         try {
             this.logic.join();
         } catch (InterruptedException e) {

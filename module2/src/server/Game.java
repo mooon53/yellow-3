@@ -80,7 +80,6 @@ public class Game {
     public void play() {
         int choice;
         while (!gameOver()) {
-            choice = scanner.nextInt();
             if (players.get(indexOfCurrentPlayer).equals(players.get(0))) {
                 players.get(indexOfCurrentPlayer).makeMove(choice);
                 indexOfCurrentPlayer++;
@@ -128,6 +127,16 @@ public class Game {
          else{
              return false;
         }
+    }
+
+    public void disconnect(){
+        String reason = Protocol.gameover("DISCONNECT");
+
+    }
+
+    public void closeConnection(){
+        this.getPlayers().get(0).close();
+        this.getPlayers().get(1).close();
     }
 
     /**

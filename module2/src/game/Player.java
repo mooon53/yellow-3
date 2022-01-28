@@ -11,7 +11,5 @@ public abstract class Player {
         return this.name;
     }
 
-    public abstract int chooseMove(Board board);
-
-    public abstract int chooseRotation(GameBoard board);
+    public abstract int[] turn(GameBoard board);
 }

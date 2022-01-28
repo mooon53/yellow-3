@@ -1,5 +1,7 @@
 package src.game;
 
+import src.Protocol;
+
 import java.util.Scanner;
 
 public class HumanPlayer extends Player{
@@ -8,49 +10,45 @@ public class HumanPlayer extends Player{
         super(name);
     }
 
-
     @Override
-    //TODO implement method
-    public int chooseMove(Board board) {
+    public int[] turn(GameBoard board){
+        int[] result = new int[3];
         Scanner scanner = new Scanner(System.in);
-        String prompt = "> " + getName() + " your turn: ";
+        String prompt = ">"+getName() + " your turn: ";
         System.out.println(prompt);
-        int choice = scanner.nextInt();
-        boolean free = choice >=0 && choice <36;
+        result[0] = scanner.nextInt();
+        boolean free = result[0] >=0 && result[0] <36;
         while(!free){
-            System.out.println("Oops, chosen index is not valid. Try again: ");
-            choice = scanner.nextInt();
-            free = choice >= 0 && choice < 36;
+            System.out.println(Protocol.error("Unacceptable input. Try again: "));
+            result[0] = scanner.nextInt();
+            free = result[0] >= 0 && result[0] < 36;
         }
-        return choice;
-    }
-    @Override
-    public int chooseRotation(GameBoard board) {
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Which subboard do you want to rotate?");
         //take input from user as index of subBoard
-        int choice = scanner.nextInt();
+        result[1] = scanner.nextInt();
         //check whether the given index is valid
-        boolean free = choice >= 0 && choice < 4;
+        free = result[1] >= 0 && result[1] < 4;
         //in case chosen field is occupied, ask user to input another index until it is free
         while (!free) {
-            System.out.println("Oops, chosen index is not valid. Try again: ");
-            choice = scanner.nextInt();
-            free = choice >= 0 && choice < 4;
+            System.out.println(Protocol.error("Oops, chosen index is not valid. Try again: "));
+            result[1] = scanner.nextInt();
+            free = result[1] >= 0 && result[1] < 4;
         }
         //now ask for the rotation
         System.out.println("Which way should it rotate? Enter 0 for right, 1 for left");
         //take input from user
-        int rotation = scanner.nextInt();
+        result[2]= scanner.nextInt();
         //check whether the given integer is valid
-        free = rotation == 0 || rotation == 1;
+        free = result[2] == 0 || result[2] == 1;
         //in case chosen field is occupied, ask user to input another index until it is free
         while (!free) {
-            System.out.println("Oops, chosen index is not valid. Try again: ");
-            rotation = scanner.nextInt();
-            free = rotation == 0 || rotation == 1;
+            System.out.println(Protocol.error("Oops, chosen index is not valid. Try again: "));
+            result[2] = scanner.nextInt();
+            free = result[2] == 0 || result[2] == 1;
         }
-
-        return choice + (rotation * 4);
+        return result;
     }
+
+    }
+
 }
