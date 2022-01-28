@@ -1,5 +1,6 @@
 package src.server;
 
+import src.Protocol;
 import src.ai.BasicStrategy;
 import src.ai.ComputerPlayer;
 import src.ai.DumbStrategy;
@@ -11,13 +12,14 @@ import src.game.Player;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.IOException;
+import java.io.PrintStream;
 import java.net.Socket;
 import java.util.Scanner;
 
 public class GameClient extends Thread {
     private Socket socket;
     private BufferedReader reader;
-    private BufferedWriter writer;
+    private PrintStream writer;
     private Player player;
     private String username;
     private String opponentUsername;
@@ -35,6 +37,7 @@ public class GameClient extends Thread {
         this.oppBoard = new GameBoard();
         try {
             socket = new Socket("localhost", port);
+            this.writer = new PrintStream(getSocket().getOutputStream());
             if (level == 1) {
                 Strategy strategy = new BasicStrategy();
                 this.player = new ComputerPlayer(strategy);
@@ -92,12 +95,14 @@ public class GameClient extends Thread {
     public void successConnection(String state) {
         viewer.checkConnection();
         viewer.announce(state);
+        this.setupGame();
     }
 
     public void failedConnection(String state) {
         viewer.checkConnection();
         viewer.announce(state);
         this.username = "-";
+        this.setConnection();
     }
 
     public void setSides(String[] users) {
@@ -110,22 +115,20 @@ public class GameClient extends Thread {
         }
     }
 
-    public void setMove(int currentPlayer) {
-        if (currentPlayer == clientID) {
-            boolean run = true;
-            int moveIndex = -1;
-            int rotation;
-            moveIndex = player.chooseMove(getMyBoard());
-            rotation = player.chooseRotation(getMyBoard());
 
-            if (moveIndex != -1 && this.player instanceof ComputerPlayer) {
-                try {
-                    Thread.sleep(200);
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-                getMyBoard().updateBoard(rotation);
-                printBoard();
+    public void sendMove(int currentPlayer) throws IOException {
+        int[] position=null;
+        if (currentPlayer == clientID) {
+            position = this.getPlayer().turn(this.myBoard);
+            String command = Protocol.move(position[0], position[1], position[2]);
+            writer.println(command);
+            writer.flush();
+        }
+        if(position!=null && this.player instanceof ComputerPlayer){
+            try{
+                Thread.sleep(200);
+            } catch (InterruptedException e) {
+                System.out.println(Protocol.error());
             }
         }
 
@@ -137,10 +140,11 @@ public class GameClient extends Thread {
 
 
     public void endGame(int winnerID) {
+        String reason;
         if (winnerID == clientID) {
-            System.out.println("Congrats! You are the king of pentago!");
-        } else {
-            System.out.println("Sorry, you lose this time ((");
+            viewer.endGame(getUsername(), "WINNER");
+        } else if(myBoard.isFull()){
+            viewer.endGame(getUsername(),"DRAW");
         }
     }
 
@@ -151,8 +155,23 @@ public class GameClient extends Thread {
 
 
     public void setUsername() {
-        System.out.println("Enter your username: ");
+        System.out.println(">Enter your username: ");
         this.username = scanner.nextLine();
+    }
+
+    public void setConnection(){
+        String username = viewer.getClientName();
+        this.username = username;
+        String command = Protocol.login(username);
+        writer.println(command);
+        writer.flush();
+    }
+
+    public void setupGame(){
+        int size = 2;
+        String command = Protocol.newGame(getUsername(), getOpponentUsername());
+        writer.println(command);
+        writer.flush();
     }
 
 

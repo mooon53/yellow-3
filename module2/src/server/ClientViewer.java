@@ -46,4 +46,8 @@ public class ClientViewer extends Thread{
         }
     }
 
+    public void endGame(String username, String reason){
+        System.out.println("GAMEOVER~"+username+"~"+reason);
+    }
+
 }

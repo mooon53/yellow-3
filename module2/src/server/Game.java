@@ -10,7 +10,7 @@ public class Game {
     public static final int NUMBER_OF_PLAYERS = 2;
     private ArrayList<ClientHandler> players;
     private GameBoard board;
-    private int indexOfCurrentPlayer;
+    private int indexOfCurrentPlayer = 0;
     Scanner scanner = new Scanner(System.in);
 
     public Game(ClientHandler player) {
@@ -59,8 +59,9 @@ public class Game {
     //queries
     public void addPlayer(ClientHandler client) {
         this.players.add(client);
-        if(this.isLobbyFull()){
+        if (this.isLobbyFull()) {
             String command = Protocol.newGame(players.get(0).getUsername(), players.get(1).getUsername());
+            this.sendMessage(command);
         }
     }
 
@@ -72,23 +73,9 @@ public class Game {
         }
     }
 
-    public void startGame() {
-        play();
-    }
-
 
     public void play() {
-        int choice;
-        while (!gameOver()) {
-            if (players.get(indexOfCurrentPlayer).equals(players.get(0))) {
-                players.get(indexOfCurrentPlayer).makeMove(choice);
-                indexOfCurrentPlayer++;
-            } else {
-                players.get(indexOfCurrentPlayer).makeMove(choice);
-                indexOfCurrentPlayer = 0;
-            }
-        }
-        update();
+
     }
 
     private void update() {
@@ -114,29 +101,45 @@ public class Game {
      */
     public boolean gameOver() {
         String reason;
-        if (board.isFull() || win()){
-            if(board.isFull()){
+        String command;
+        if (board.isFull() || win()) {
+            if (board.isFull()) {
                 reason = "DRAW";
-                Protocol.gameover(reason);
-            } else if(win()){
+                command = Protocol.gameover(reason);
+                sendMessage(command);
+            } else if (win()) {
                 reason = "VICTORY";
-                Protocol.gameover(reason);
+                command = Protocol.gameover(reason);
+                sendMessage(command);
             }
+            closeGame();
+            closeConnection();
             return true;
-        }
-         else{
-             return false;
+        } else {
+            return false;
         }
     }
 
-    public void disconnect(){
+    public void disconnect() {
         String reason = Protocol.gameover("DISCONNECT");
+        Protocol.quit();
+        sendMessage(reason);
 
     }
 
-    public void closeConnection(){
+    public void closeConnection() {
         this.getPlayers().get(0).close();
         this.getPlayers().get(1).close();
+    }
+
+    public void sendTurn() {
+        String command = Protocol.ping();
+        this.sendMessage(command);
+    }
+
+    public void getTurn(){
+        String command = Protocol.pong();
+        this.sendMessage(command);
     }
 
     /**
@@ -160,6 +163,11 @@ public class Game {
     public void closeGame() {
         this.getPlayers().get(0).close();
         this.getPlayers().get(1).close();
+    }
+
+    public void sendMessage(String msg){
+        players.get(0).sendMessage(msg);
+        players.get(1).sendMessage(msg);
     }
 
 }

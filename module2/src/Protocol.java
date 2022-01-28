@@ -145,4 +145,16 @@ public class Protocol {
         return protocolMessage(new Object[]{CommandsIdentifier.LIST, names});
     }
 
+    public static String quit(){
+        return protocolMessage(new Object[]{CommandsIdentifier.QUIT});
+    }
+
+    public static String ping(){
+        return protocolMessage(new Object[]{CommandsIdentifier.PING});
+    }
+
+    public static String pong(){
+        return protocolMessage(new Object[]{CommandsIdentifier.PONG});
+    }
+
 }
