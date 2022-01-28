@@ -1,7 +1,5 @@
 package src.ai;
 
-
-import src.game.Board;
 import src.game.GameBoard;
 import src.game.Mark;
 import src.game.Player;
@@ -16,16 +14,12 @@ public class ComputerPlayer extends Player {
     }
 
     @Override
-    public int chooseMove(Board board) {
+    public int[] turn(GameBoard board){
         moveList = strategy.determineMove(board, Mark.XX);
-        return 0;
-    }
-
-
-    public int chooseRotation(GameBoard board) {
         //since chooseMove is called first in the makeMove method, this works
-        return moveList[1];
+        return moveList;
     }
+
 
     //@pure;
     public Strategy getStrategy() {
