@@ -6,15 +6,16 @@ import java.net.Socket;
 import java.util.ArrayList;
 
 public class GameServer implements Server {
-    private ArrayList<ClientHandler> clientHandlers = new ArrayList<>();//list of clientHandlers from server
-    private ArrayList<Game> games = new ArrayList<>(); //list of active games
+    private ArrayList<ClientHandler> clientHandlers;//list of clientHandlers from server
     private ServerSocket serverSocket;
+    private ServerViewer viewer;
 
     public GameServer(ServerSocket serverSocket){
+        clientHandlers = new ArrayList<>();
+        setViewer();
         System.out.println("_____Pentago Server_____");
         this.serverSocket = serverSocket;
-        System.out.println("Connection opened at port: "+serverSocket.getLocalPort());
-
+        this.getViewer().announce("Connected to port: "+ serverSocket.getLocalPort());
     }
 
     //getters
@@ -24,12 +25,14 @@ public class GameServer implements Server {
         return this.clientHandlers;
     }
 
-    //@requires games.size()!=0;
     //@pure;
-    public ArrayList<Game> getGames() {
-        return this.games;
+    public ServerSocket getServerSocket() {
+        return serverSocket;
     }
-
+    //@pure;
+    public ServerViewer getViewer() {
+        return viewer;
+    }
 
     @Override
     public void connect() {
@@ -40,7 +43,9 @@ public class GameServer implements Server {
                 Socket socket = this.serverSocket.accept();
                 ClientHandler ch = new ClientHandler(socket, this);
                 this.clientHandlers.add(ch);
+                ch.setMark(clientHandlers.size());
                 System.out.println("Players connected: " + this.clientHandlers.size());
+                //System.out.println(ch.getMark().toString());
                 (new Thread(ch)).start();
 
             }
@@ -51,6 +56,13 @@ public class GameServer implements Server {
             this.stop();
         }
 
+    }
+
+
+    public void removeClient(ClientHandler clientHandler){
+        String msg = clientHandler.getUsername() + "left the game";
+        this.getViewer().announce(msg);
+        this.clientHandlers.remove(clientHandler);
     }
 
     @Override
@@ -72,12 +84,21 @@ public class GameServer implements Server {
     public Game createGame(ClientHandler clientHandler){
         Game newGame = null;
         if(clientHandler!=null){
-            newGame = new Game(2,clientHandler);
-            games.add(newGame);
+            newGame = new Game(clientHandler);
         } else{
             System.out.println("Unable to create game.");
             stop();
         }
         return newGame;
     }
+
+    public void setViewer(){
+        this.viewer = new ServerViewer(this);
+        new Thread(this.viewer).start();
+    }
+
+    public void run(){
+        connect();
+    }
+
 }

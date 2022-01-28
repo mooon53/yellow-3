@@ -2,6 +2,7 @@ package src.server;
 
 
 
+import src.game.GameBoard;
 import src.game.Mark;
 
 import java.io.*;
@@ -15,6 +16,7 @@ public class ClientHandler extends Thread {
     private Game game;
     private BufferedReader reader;
     private BufferedWriter writer;
+    private Thread logic;
 
     public ClientHandler(Socket socket, GameServer server) {
         try {
@@ -22,6 +24,8 @@ public class ClientHandler extends Thread {
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             this.server = server;
             this.writer = new BufferedWriter(new OutputStreamWriter(socket.getOutputStream()));
+            logic = new Logic(this);
+            new Thread(this.logic).start();
         } catch (IOException e) {
             close();
         }
@@ -43,12 +47,38 @@ public class ClientHandler extends Thread {
     public Mark getMark() {
         return mark;
     }
+    //@pure;
+    public Socket getSocket() {
+        return this.socket;
+    }
+    //@pure;
+    public Thread getLogic() {
+        return logic;
+    }
+    //@pure;
+    public GameServer getServer() {
+        return server;
+    }
 
     //queries
     public void connect(String username) {
         if (username != null) {
             this.username = username;
-            System.out.println("New player connected");
+            String msg = "New player connected";
+            this.announce(msg);
+        } else{
+            String msg = "Invalid username.";
+            this.announce(msg);
+        }
+    }
+    public void announce(String msg){
+        if(this.writer != null){
+            try {
+                this.writer.write(msg);
+                this.writer.flush();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
     }
 
@@ -57,17 +87,26 @@ public class ClientHandler extends Thread {
     }
 
     public void makeMove(int index) {
+        if(this.game.gameOver() == false){
+            int player = this.game.getIndexOfCurrentPlayer();
+            GameBoard currentBoard = this.game.getBoard();
+            currentBoard.setField(index, getMark());
+            this.game.next();
+        }
+
 
     }
 
     public void setMark(int index) {
-        if (index == 0) {
+        if (index == 1) {
             this.mark = Mark.XX;
         } else {
             this.mark = Mark.OO;
         }
 
     }
+
+
 
     public void close() {
         try {
@@ -80,6 +119,13 @@ public class ClientHandler extends Thread {
             e.printStackTrace();
         }
 
+    }
+
+    public void run(){
+        try {
+            this.logic.join();
+        } catch (InterruptedException e) {
+        }
     }
 
 }

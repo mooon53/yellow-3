@@ -10,10 +10,21 @@ public class HumanPlayer extends Player{
 
 
     @Override
-    public void chooseMove(Board board) {
+    //TODO implement method
+    public int chooseMove(Board board) {
+        Scanner scanner = new Scanner(System.in);
         String prompt = "> " + getName() + " your turn: ";
         System.out.println(prompt);
+        int choice = scanner.nextInt();
+        boolean free = choice >=0 && choice <36;
+        while(!free){
+            System.out.println("Oops, chosen index is not valid. Try again: ");
+            choice = scanner.nextInt();
+            free = choice >= 0 && choice < 36;
+        }
+        return choice;
     }
+    @Override
     public int chooseRotation(GameBoard board) {
         Scanner scanner = new Scanner(System.in);
         System.out.println("Which subboard do you want to rotate?");

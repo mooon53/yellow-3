@@ -19,7 +19,7 @@ public class GameTest {
         player1 = new HumanPlayer("player1");
         player2 = new HumanPlayer("player2");
         board = new GameBoard();
-        game = new Game(player1, player2);
+        //game = new Game(player1, player2);
     }
 
     @Test

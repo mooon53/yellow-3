@@ -1,5 +1,6 @@
 package src.server;
 
+import src.Protocol;
 import src.game.GameBoard;
 
 import java.util.ArrayList;
@@ -8,16 +9,15 @@ import java.util.Scanner;
 public class Game {
     public static final int NUMBER_OF_PLAYERS = 2;
     private ArrayList<ClientHandler> players;
-    private GameBoard[] boards;
+    private GameBoard board;
     private int indexOfCurrentPlayer;
     Scanner scanner = new Scanner(System.in);
 
-    public Game(int indexOfCurrentPlayer, ClientHandler player) {
+    public Game(ClientHandler player) {
         this.players = new ArrayList<>();
-        this.boards = new GameBoard[indexOfCurrentPlayer];
+        this.board = new GameBoard();
         this.players.add(player);
-        player.setMark(indexOfCurrentPlayer);
-        this.indexOfCurrentPlayer = 0;
+        System.out.println("Your mark is: " + player.getMark().toString());
     }
 
     //getters
@@ -39,6 +39,10 @@ public class Game {
         return usernames;
     }
 
+    public GameBoard getBoard() {
+        return board;
+    }
+
     //@pure;
     public int getIndexOfCurrentPlayer() {
         return indexOfCurrentPlayer;
@@ -55,6 +59,9 @@ public class Game {
     //queries
     public void addPlayer(ClientHandler client) {
         this.players.add(client);
+        if(this.isLobbyFull()){
+            String command = Protocol.newGame(players.get(0).getUsername(), players.get(1).getUsername());
+        }
     }
 
     public boolean isLobbyFull() {
@@ -73,7 +80,7 @@ public class Game {
     public void play() {
         int choice;
         while (!gameOver()) {
-            choice =scanner.nextInt();
+            choice = scanner.nextInt();
             if (players.get(indexOfCurrentPlayer).equals(players.get(0))) {
                 players.get(indexOfCurrentPlayer).makeMove(choice);
                 indexOfCurrentPlayer++;
@@ -93,36 +100,52 @@ public class Game {
         }
     }
 
-    private void next(){
-        if(indexOfCurrentPlayer == 0){
+    public void next() {
+        if (indexOfCurrentPlayer == 0) {
             this.indexOfCurrentPlayer = 1;
-        } else{
+        } else {
             this.indexOfCurrentPlayer = 0;
         }
     }
+
     /**
      * Game is over either if there are no empty fields or there is a winner
      *
      * @return true if the game is over
      */
     public boolean gameOver() {
-        return (boards[0].isFull()||boards[1].isFull() || win());
+        String reason;
+        if (board.isFull() || win()){
+            if(board.isFull()){
+                reason = "DRAW";
+                Protocol.gameover(reason);
+            } else if(win()){
+                reason = "VICTORY";
+                Protocol.gameover(reason);
+            }
+            return true;
+        }
+         else{
+             return false;
+        }
     }
+
     /**
      * @return true if one of players is a winner
      */
     public boolean win() {
         return isWinner(indexOfCurrentPlayer);
     }
+
     /**
      * @param indexOfCurrentPlayer represents the current player to be checked
      * @return true if one of players is a winner in either direction
      */
     public boolean isWinner(int indexOfCurrentPlayer) {
-        return boards[indexOfCurrentPlayer].winLine(players.get(indexOfCurrentPlayer).getMark()) ||
-                boards[indexOfCurrentPlayer].winCol(players.get(indexOfCurrentPlayer).getMark()) ||
-                boards[indexOfCurrentPlayer].winDiagonal(players.get(indexOfCurrentPlayer).getMark())||
-                boards[indexOfCurrentPlayer].winIrregularDiagonal(players.get(indexOfCurrentPlayer).getMark());
+        return board.winLine(players.get(indexOfCurrentPlayer).getMark()) ||
+                board.winCol(players.get(indexOfCurrentPlayer).getMark()) ||
+                board.winDiagonal(players.get(indexOfCurrentPlayer).getMark()) ||
+                board.winIrregularDiagonal(players.get(indexOfCurrentPlayer).getMark());
     }
 
     public void closeGame() {
