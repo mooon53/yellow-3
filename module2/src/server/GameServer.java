@@ -113,9 +113,8 @@ public class GameServer extends Thread implements Server {
             this.username = username;
             command = Protocol.login();
         } else {
-            String no = "choose another username";
-            System.out.println(no);
             command = Protocol.alreadyLoggedIn();
+            loggedPlayers.remove(loggedPlayers.size()-1);
         }
         if (clientHandlers.size() > 1) {
             notify();

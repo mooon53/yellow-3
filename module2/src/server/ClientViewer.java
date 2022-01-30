@@ -42,14 +42,6 @@ public class ClientViewer extends Thread{
         System.out.println(msg);
     }
 
-    public void checkConnection(){
-        if(this.client.getSocket().isConnected()){
-            System.out.println("Good Connection");
-        } else{
-            System.out.println("No connection.");
-        }
-    }
-
 
     public void endGame(String reason){//add winners and draw
         for(Player player : this.getClient().getPlayers()){

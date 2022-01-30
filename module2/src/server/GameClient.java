@@ -143,8 +143,7 @@ public class GameClient extends Thread {
 
         String username = viewer.getClientName();
         this.username = username;
-        viewer.checkConnection();
-        greeting("Client by " + username);
+        login();
 
 
     }
@@ -190,7 +189,7 @@ public class GameClient extends Thread {
 
     //logic queries
     public synchronized void greeting(String name) {
-        String command = Protocol.greeting(name);
+        String command = Protocol.greeting("Client by "+name);
         writer.println(command);
         writer.flush();
     }
