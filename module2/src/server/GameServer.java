@@ -9,7 +9,6 @@ import java.io.IOException;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Collection;
 
 public class GameServer extends Thread implements Server {
     private ArrayList<ClientHandler> clientHandlers;//list of clientHandlers from server QUEUE
@@ -130,7 +129,7 @@ public class GameServer extends Thread implements Server {
         } else if (state == 1) {
             queue.add(clientHandler);
             for (ClientHandler ch : this.queue) {
-                Player player = new HumanPlayer(ch.getUsername(), false);
+                Player player = new HumanPlayer(ch.getUsername());
                 players.add(player);
                 sendList();
                 state++;
@@ -144,8 +143,8 @@ public class GameServer extends Thread implements Server {
             game = new Game(players.get(0), players.get(1));
             games.add(game);
             viewer.displayServerStatus();
-            players.get(0).setMark(0);
-            players.get(1).setMark(1);
+            players.get(0).assignMark(0);
+            players.get(1).assignMark(1);
 
             command = Protocol.newGame(players.get(0).getName(), players.get(1).getName());
 

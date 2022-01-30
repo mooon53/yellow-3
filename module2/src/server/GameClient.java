@@ -1,12 +1,10 @@
 package src.server;
 
 import src.Protocol;
-import src.ai.BasicStrategy;
 import src.ai.ComputerPlayer;
-import src.ai.DumbStrategy;
-import src.ai.Strategy;
 import src.game.GameBoard;
 import src.game.HumanPlayer;
+import src.game.Mark;
 import src.game.Player;
 
 import java.io.BufferedReader;
@@ -22,8 +20,8 @@ public class GameClient extends Thread {
     private Lock lock = new ReentrantLock();
     private Socket socket;
     private BufferedReader reader;
-    private PrintStream writer;
-    private ArrayList<Player> players = new ArrayList<>();
+    private PrintStream writer;private ArrayList<Player> players;
+
     private ComputerPlayer cp = null;
     private String username;
     private String opponentUsername;
@@ -38,6 +36,7 @@ public class GameClient extends Thread {
     public GameClient() {
         this.viewer = new ClientViewer(this);
         Thread view = new Thread(viewer);
+        players = new ArrayList<>();
         view.start();
         this.myBoard = new GameBoard();
         try {
@@ -94,13 +93,13 @@ public class GameClient extends Thread {
     //set player - matk - ID connection
     public void setSides() {
         if (this.players.get(0).getName().equals(getUsername())) {
-            this.clientID = 1;
-            this.opponentUsername = this.players.get(0).getName();
-            this.players.get(0).setMark(0);
+            this.clientID = 0;
+            this.opponentUsername = this.players.get(this.clientID).getName();
+            this.players.get(0).assignMark(0);
         } else {
-            this.clientID = 2;
-            this.opponentUsername = this.players.get(0).getName();
-            this.players.get(0).setMark(1);
+            this.clientID = 1;
+            this.opponentUsername = this.players.get(this.clientID).getName();
+            this.players.get(0).assignMark(1);
         }
     }
 
@@ -140,7 +139,6 @@ public class GameClient extends Thread {
 
 
     public synchronized void setConnection() {
-
         String username = viewer.getClientName();
         this.username = username;
         login();
@@ -149,13 +147,17 @@ public class GameClient extends Thread {
     }
 
     public synchronized void setupGame() {
-        Player player1 = new HumanPlayer(getOpponentUsername(), true);
-        this.clientID = 0;
+        Player player1 = new HumanPlayer(getUsername());
+        player1.assignMark(0);
+        Mark mark1 = player1.getMark();
         this.players.add(player1);
-        Player player2 = new HumanPlayer(getUsername(), false);
+        Player player2 = new HumanPlayer(getOpponentUsername());
         this.players.add(player2);
+        player2.assignMark(1);
+        Mark mark2 = player2.getMark();
         this.game = new Game(player1, player2);
-        setSides();
+        System.out.println("CHEKK: "+player1.getName()+mark1);
+        System.out.println("CHEKK: "+player2.getName()+mark2);
         sendTurn(player1.getName());
     }
 

@@ -5,10 +5,12 @@ import src.Protocol;
 import java.util.Scanner;
 
 public class HumanPlayer extends Player {
+    private Mark mark;
 
-    public HumanPlayer(String name, boolean turn) {
-        super(name,turn);
+    public HumanPlayer(String name) {
+        super(name);
     }
+
 
     @Override
     public int[] turn(GameBoard board) {
