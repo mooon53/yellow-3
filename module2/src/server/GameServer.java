@@ -11,11 +11,11 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class GameServer extends Thread implements Server{
+public class GameServer extends Thread implements Server {
     private ArrayList<ClientHandler> clientHandlers;//list of clientHandlers from server QUEUE
     private ServerSocket serverSocket;
     private ServerViewer viewer;
-    private ArrayList<Game> games;
+    private ArrayList<Game> games = new ArrayList<>();
     private String username;
     private Mark mark;
     private Game game;
@@ -23,12 +23,11 @@ public class GameServer extends Thread implements Server{
     private ArrayList<ClientHandler> queue;
     private ArrayList<String> loggedPlayers = new ArrayList<>();
     private ArrayList<Player> players = new ArrayList<>();
-    ;
+
 
     public GameServer(int port) {
         try {
             clientHandlers = new ArrayList<>();
-            games = new ArrayList<>();
             queue = new ArrayList<>();
             setViewer();
             System.out.println("_____Pentago Server_____");
@@ -61,6 +60,18 @@ public class GameServer extends Thread implements Server{
 
     public Socket getSocket() {
         return this.socket;
+    }
+
+    public Game getGame(String username) {
+        Game giveGame = null;
+        for (Game game : this.getGames()) {
+            for (Player player : game.getPlayers()) {
+                if (username.equals(player.getName())) {
+                    return giveGame = game;
+                }
+            }
+        }
+        return giveGame;
     }
 
     @Override
@@ -111,54 +122,107 @@ public class GameServer extends Thread implements Server{
         return command;
     }
 
-    public synchronized String addToQueue(ClientHandler clientHandler) {
-        String command = null;
+    public synchronized void addToQueue(ClientHandler clientHandler) {
         int state = this.getQueue().size();
         if (state == 0) {
             this.queue.add(clientHandler);
             state++;
-            command = (Protocol.queue());
         } else if (state == 1) {
             queue.add(clientHandler);
             for (ClientHandler ch : this.queue) {
-                Player player = new HumanPlayer(ch.getUsername());
+                Player player = new HumanPlayer(ch.getUsername(), false);
                 players.add(player);
                 sendList();
                 state++;
             }
-            if (players.size() == 2) {
-                this.createGame();
-            } else {
-                try {
-                    System.out.println("WAAAAITING");
-                    this.wait();
+        }
+    }
 
-                } catch (InterruptedException e) {
-                    System.out.println(Protocol.error("Waiting interrupted"));
+    public String createGame() {
+        String command = null;
+        if (players.size() == 2) {
+            game = new Game(players.get(0), players.get(1));
+            games.add(game);
+            viewer.displayServerStatus();
+            players.get(0).setMark(0);
+            players.get(1).setMark(1);
+
+            command = Protocol.newGame(players.get(0).getName(), players.get(1).getName());
+
+
+
+            for (ClientHandler clientHandler : queue) {
+                clientHandler.sendMessage(command);
+            }
+
+            /*
+            for(ClientHandler ch : queue){
+                ch.sendMessage(setMoveByName(ch.getUsername())[0]);
+                ch.sendMessage(setMoveByName(ch.getUsername())[1]);
+            }*/
+
+            players.remove(1);
+            players.remove(0);
+            this.queue.clear();
+            return command;
+        }
+        return command;
+    }
+
+    public synchronized String[] getTurnByName(ArrayList<Player> parr) {
+        String[] com = new String[2];
+        for (Game game : getGames()) {
+            if (game.getPlayers().equals(parr)) {
+                String curPlayer = game.getPlayer().getName();
+                com[0] = curPlayer;
+                String waitingPlayer;
+                for (String name : game.getUsernames()) {
+                    if (!name.equals(curPlayer)) {
+                        waitingPlayer = name;
+                        com[1] = waitingPlayer;
+                    }
                 }
+            }
+        }
+        return com;
+    }
+
+    public synchronized String[] setMoveByName(String username) {
+        String[] turnByProtocol = new String[2];
+        if (getGame(username) != null && getGame(username).getPlayers().get(0).getName().equals(username)) {
+            turnByProtocol[0] = Protocol.sendTurn("0~" + (getTurnByName(getGame(username).getPlayers()))[1]);
+            turnByProtocol[1] = Protocol.sendTurn("1~" + (getTurnByName(getGame(username).getPlayers()))[0]);
+        } else {
+            turnByProtocol[0] = Protocol.sendTurn("0~" + (getTurnByName(getGame(username).getPlayers()))[0]);
+            turnByProtocol[1] = Protocol.sendTurn("1~" + (getTurnByName(getGame(username).getPlayers()))[1]);
+        }
+        return turnByProtocol;
+    }
+
+
+    public synchronized String move(int move, int rotation) {
+        String command = null;
+        int yourTurn = 0;
+        for (ClientHandler clientHandler : clientHandlers) {
+            clientHandler.makeMove(move, rotation);
+            command = Protocol.move(move, rotation);
+            if (yourTurn == 0) {
+                yourTurn = 1;
+            } else {
+                yourTurn = 0;
             }
         }
         return command;
     }
 
-    public synchronized String createGame() {
-        game = new Game(players.get(0), players.get(1));
-        players.get(0).setMark(0);
-        players.get(1).setMark(1);
-        String command = Protocol.newGame(players.get(0).getName(), players.get(1).getName());
-        players.remove(0);
-        players.remove(1);
-        this.getClientHandlers().clear();
-        return command;
-    }
-
     public synchronized String greeting(String username) {
+        this.username = username.replace("Client by ", "");
+        clientHandlers.get(clientHandlers.size() - 1).setUsername(this.username);
         String command = Protocol.greeting(username.replace("Client by ", "Server by "));//Server by Name
         return command;
     }
 
     public String quit() {
-        this.stop();
         String command = Protocol.quit();
         return command;
 
@@ -168,8 +232,8 @@ public class GameServer extends Thread implements Server{
     public boolean availableUsername(String username) {
         boolean is = true;
         if (!this.getClientHandlers().isEmpty()) {
-            for (ClientHandler clientHandler : this.getClientHandlers()) {
-                if (clientHandler.getUsername() != null && !clientHandler.getUsername().equals("") && clientHandler.getUsername().equals(username)) {
+            for (String player : this.loggedPlayers) {
+                if (player != null && !player.equals("") && player.equals(username)) {
                     is = false;
                 }
             }
@@ -179,11 +243,12 @@ public class GameServer extends Thread implements Server{
 
     public synchronized String sendList() {
         String command = Protocol.list(loggedPlayers);
+        viewer.displayServerStatus();
         return command;
     }
 
-    public void ping() {
-        System.out.println("PING");
+    public String ping() {
+        return Protocol.ping();
     }
 
     public void pong() {
@@ -194,15 +259,16 @@ public class GameServer extends Thread implements Server{
     public ArrayList<Game> getGames() {
         return this.games;
     }
-    public void run(){
-        try{
-            while (true){
+
+    public void run() {
+        try {
+            while (true) {
                 Socket sock = serverSocket.accept();
                 ClientHandler handler = new ClientHandler(sock, this);
                 this.addClientHandler(handler);
             }
 
-        } catch (IOException e){
+        } catch (IOException e) {
             System.out.println(e.getMessage());
         }
     }

@@ -8,7 +8,6 @@ import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientViewer extends Thread{
     private GameClient client;
-    private Lock lock = new ReentrantLock();
     Scanner scanner = new Scanner(System.in);
 
     public  ClientViewer(GameClient client){
@@ -35,7 +34,7 @@ public class ClientViewer extends Thread{
         return  port;
     }
 
-    public void getEnemyName(){
+    public void displayOpponentUsername(){
         System.out.println("Your opponent: "+getClient().getOpponentUsername());
     }
 

@@ -9,9 +9,7 @@ import src.game.Player;
 
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Random;
-import java.util.function.DoubleToIntFunction;
+
 
 public class ClientHandler extends Thread {
     private GameServer server;
@@ -22,6 +20,8 @@ public class ClientHandler extends Thread {
     private BufferedReader reader;
     private PrintStream writer;
     private Thread logic;
+    private int clienthandlerID;
+    private boolean yourTurn=true;
 
 
     public ClientHandler(Socket socket, GameServer server) {
@@ -29,6 +29,7 @@ public class ClientHandler extends Thread {
             this.socket = socket;
             this.server = server;
             this.writer = new PrintStream(getSocket().getOutputStream());
+            this.reader = new BufferedReader(new InputStreamReader(getSocket().getInputStream()));
             this.setupLogic();
         } catch (IOException e) {
             close();
@@ -39,7 +40,11 @@ public class ClientHandler extends Thread {
 
     //@pure;
     public String getUsername() {
-        return username;
+        return this.username;
+    }
+
+    public void setUsername(String username){
+       this.username = username;
     }
 
     //@pure;
@@ -90,13 +95,9 @@ public class ClientHandler extends Thread {
 
     }
 
-    public void announce(String msg) {
-        if (this.writer != null) {
 
-            this.writer.println(msg);
-            this.writer.flush();
-        }
-    }
+
+
 
 
     public void makeMove(int index, int rotation) {

@@ -16,8 +16,8 @@ public class GameTest {
 
     @BeforeEach
     public void setup(){
-        player1 = new HumanPlayer("player1");
-        player2 = new HumanPlayer("player2");
+        player1 = new HumanPlayer("player1",true);
+        player2 = new HumanPlayer("player2", false);
         board = new GameBoard();
         //game = new Game(player1, player2);
     }

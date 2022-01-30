@@ -95,14 +95,14 @@ public class Logic extends Thread {
                         this.getClientHandler().sendMessage(com);
                         break;
                     case QUEUE:
-                        com = (this.getClientHandler().getServer().addToQueue(this.clientHandler));
-                        System.out.println(com);
-                        this.getClientHandler().sendMessage(com);
+                        this.getClientHandler().getServer().addToQueue(this.clientHandler);
+                        System.out.println(this.getClientHandler().getServer().createGame());
                         break;
                     case MOVE:
-                        int move = Integer.parseInt((String) decode.get(1));
-                        int rotation = Integer.parseInt((String) decode.get(2));
-                        //server.makeMove(move, rotation);
+                        int move = Integer.parseInt(decode.get(1));
+                        int rotation = Integer.parseInt(decode.get(2));
+                        com = this.getClientHandler().getServer().move(move, rotation);
+                        this.getClientHandler().sendMessage(com);
                         break;
                     case QUIT:
                         com = (this.getClientHandler().getServer().quit());
@@ -116,7 +116,7 @@ public class Logic extends Thread {
                         this.getClientHandler().getServer().ping();
                         break;
                     default:
-                        System.out.println(Protocol.error("from client"));
+                        System.out.println(protocolMessage);
                         break;
                 }
             }
@@ -150,16 +150,23 @@ public class Logic extends Thread {
                         this.getPlayer().joinList();
                         break;
                     case ALREADYLOGGEDIN:
+                        this.getPlayer().getViewer().getClientName();
                         this.getPlayer().login();
                         break;
                     case LIST:
                         this.getPlayer().joinQueue();
                         break;
                     case NEWGAME:
-                        System.out.println("YEAH");
+                        if(decode.get(1).equals(this.getPlayer().getUsername())){
+                            this.getPlayer().setOpponentUsername(decode.get(2));
+                        } else{
+                            this.getPlayer().setOpponentUsername(decode.get(1));
+                        }
+                        this.getPlayer().setupGame();
                         break;
+
                     case MOVE:
-                        this.getPlayer().sendMove(this.player.getClientID());
+                        this.getPlayer().move();
                         break;
                     case GAMEOVER:
                         this.getPlayer().endGame(this.player.getClientID());
@@ -174,7 +181,7 @@ public class Logic extends Thread {
                         this.getPlayer().ping();
                         break;
                     default:
-                        System.out.println(Protocol.error("from server"));
+                        System.out.println(protocolMessage);
                         break;
 
                 }

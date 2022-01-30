@@ -27,6 +27,7 @@ public class Protocol {
         ALREADYLOGGEDIN, //username is already logged in
         LIST, //list of logged clients of game
         NEWGAME, //new game
+        SENDTURN, //turn of current player
         MOVE, //move
         GAMEOVER, //game over : disconnect/victory/draw
         PING, //send
@@ -100,6 +101,9 @@ public class Protocol {
     public static String move(int index, int rotation){
         return "MOVE~"+index+AS+rotation;
     }
+    public static String sendTurn(String text){
+        return "SENDTURN~"+text;
+    }
     public static String gameover(String reason){
         return "GAMEOVER"+AS+reason;
     }
@@ -123,7 +127,7 @@ public class Protocol {
     }
 
     public static String alreadyLoggedIn(){
-        return "ALREADYLIGGEDIN";
+        return "ALREADYLOGGEDIN";
     }
 
     public static String quit(){

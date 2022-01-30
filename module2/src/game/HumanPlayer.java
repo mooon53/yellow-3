@@ -6,8 +6,8 @@ import java.util.Scanner;
 
 public class HumanPlayer extends Player {
 
-    public HumanPlayer(String name) {
-        super(name);
+    public HumanPlayer(String name, boolean turn) {
+        super(name,turn);
     }
 
     @Override

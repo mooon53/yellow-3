@@ -30,6 +30,10 @@ public class Game {
         return players;
     }
 
+    public Player getPlayer(){
+        return players.get(indexOfCurrentPlayer);
+    }
+
     //@requires players!=null;
     // @ensures \result.size() == players.size();
     public String[] getUsernames() {
@@ -61,6 +65,7 @@ public class Game {
 
     //queries
 
+
     public void setMark(Player player, int index) {
         if (index == 1) {
             this.mark = Mark.XX;
@@ -83,7 +88,7 @@ public class Game {
         this.board = new GameBoard();
     }
 
-    private void update() {
+    protected void update() {
         Player winner;
         if (win()) {
             winner = isWinner(this.indexOfCurrentPlayer) ? players.get(0) : players.get(1);
@@ -91,12 +96,13 @@ public class Game {
         }
     }
 
-    public void next() {
-        if (indexOfCurrentPlayer == 0) {
+    public int next() {
+        if (this.indexOfCurrentPlayer == 0) {
             this.indexOfCurrentPlayer = 1;
         } else {
             this.indexOfCurrentPlayer = 0;
         }
+        return this.indexOfCurrentPlayer;
     }
 
     /**
@@ -144,7 +150,20 @@ public class Game {
                 board.winIrregularDiagonal(players.get(indexOfCurrentPlayer).getMark());
     }
 
+    public void play(){
+        String com=null;
+        while(!gameOver()){
+            indexOfCurrentPlayer = 0;
+            setupBoard();
+            int [] move = players.get(indexOfCurrentPlayer).turn(getBoard());
+            com = Protocol.move(move[0], move[1]);
+            update();
+            next();
+            gameOver();
+        }
+        com = Protocol.quit();
 
+    }
 
 
 

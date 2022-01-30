@@ -3,9 +3,11 @@ package src.game;
 public abstract class Player {
     private String name;
     private Mark mark;
+    private boolean yourTurn;
 
-    public Player(String name){
+    public Player(String name, boolean turn){
         this.name = name;
+        this.yourTurn = turn;
     }
 
     public String getName() {
@@ -21,6 +23,23 @@ public abstract class Player {
             this.mark = Mark.OO;
         }
 
+    }
+    public boolean getTurn(){
+        return yourTurn;
+    }
+    public boolean getTurnByName(String name){
+        boolean res = false;
+        if(this.getName().equals(name)){
+            res = this.getTurn();
+        }
+        return res;
+    }
+    public void setTurn(){
+        if(yourTurn){
+            this.yourTurn = false;
+        } else{
+            this.yourTurn = true;
+        }
     }
 
     public Mark getMark() {

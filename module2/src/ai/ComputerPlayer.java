@@ -8,8 +8,8 @@ public class ComputerPlayer extends Player {
     private Strategy strategy;
     private int[] moveList;
 
-    public ComputerPlayer(Strategy strategy) {
-        super(strategy.getName() + "-");
+    public ComputerPlayer(Strategy strategy, boolean turn) {
+        super(strategy.getName() + "-", turn);
         this.strategy = strategy;
     }
 
