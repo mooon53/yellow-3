@@ -86,8 +86,9 @@ public class GameServer extends Thread implements Server {
     }
 
 
-    public void removeClient(ClientHandler clientHandler) {
+    public String removeClient(ClientHandler clientHandler) {
         this.clientHandlers.remove(clientHandler);
+        return Protocol.gameover("DISCONNECT");
     }
 
     @Override
@@ -150,17 +151,9 @@ public class GameServer extends Thread implements Server {
             command = Protocol.newGame(players.get(0).getName(), players.get(1).getName());
 
 
-
             for (ClientHandler clientHandler : queue) {
                 clientHandler.sendMessage(command);
             }
-
-            /*
-            for(ClientHandler ch : queue){
-                ch.sendMessage(setMoveByName(ch.getUsername())[0]);
-                ch.sendMessage(setMoveByName(ch.getUsername())[1]);
-            }*/
-
             players.remove(1);
             players.remove(0);
             this.queue.clear();
@@ -187,18 +180,24 @@ public class GameServer extends Thread implements Server {
         return com;
     }
 
-    public synchronized String[] setMoveByName(String username) {
-        String[] turnByProtocol = new String[2];
+    public synchronized String setMoveByName(String username) {
+        String turnByProtocol = null;
         if (getGame(username) != null && getGame(username).getPlayers().get(0).getName().equals(username)) {
-            turnByProtocol[0] = Protocol.sendTurn("0~" + (getTurnByName(getGame(username).getPlayers()))[1]);
-            turnByProtocol[1] = Protocol.sendTurn("1~" + (getTurnByName(getGame(username).getPlayers()))[0]);
+            turnByProtocol = Protocol.sendTurn((getTurnByName(getGame(username).getPlayers()))[1]);
         } else {
-            turnByProtocol[0] = Protocol.sendTurn("0~" + (getTurnByName(getGame(username).getPlayers()))[0]);
-            turnByProtocol[1] = Protocol.sendTurn("1~" + (getTurnByName(getGame(username).getPlayers()))[1]);
+            turnByProtocol = Protocol.sendTurn((getTurnByName(getGame(username).getPlayers()))[0]);
         }
         return turnByProtocol;
     }
 
+    public synchronized void sendTurn(String username) {
+        for (ClientHandler ch : queue) {
+            System.out.println(ch.getUsername()+" ppppp");
+            if(ch.getUsername().equals(username)){
+                ch.sendMessage(setMoveByName(ch.getUsername()));
+            }
+        }
+    }
 
     public synchronized String move(int move, int rotation) {
         String command = null;
@@ -222,11 +221,6 @@ public class GameServer extends Thread implements Server {
         return command;
     }
 
-    public String quit() {
-        String command = Protocol.quit();
-        return command;
-
-    }
 
 
     public boolean availableUsername(String username) {

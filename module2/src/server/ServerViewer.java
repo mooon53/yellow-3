@@ -21,6 +21,9 @@ public class ServerViewer extends Thread{
         int port = scanner.nextInt();
         return port;
     }
+    public void displayLeftClients(ClientHandler clientHandler){
+        System.out.println(clientHandler.getUsername()+" left game.");
+    }
 
     public void displayServerStatus(){
 

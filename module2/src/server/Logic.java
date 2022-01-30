@@ -104,10 +104,15 @@ public class Logic extends Thread {
                         com = this.getClientHandler().getServer().move(move, rotation);
                         this.getClientHandler().sendMessage(com);
                         break;
+                    case SENDTURN:
+                        String nameToTurn = decode.get(1);
+                        this.getClientHandler().getServer().sendTurn(nameToTurn);
+                        break;
                     case QUIT:
-                        com = (this.getClientHandler().getServer().quit());
+                        com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
                         System.out.println(com);
                         this.getClientHandler().sendMessage(com);
+                        this.clientHandler.shutDown();
                         break;
                     case PING:
                         this.getClientHandler().getServer().pong();
@@ -122,7 +127,6 @@ public class Logic extends Thread {
             }
 
         }
-        System.out.println("SOVSEM");
         clientHandler.getServer().removeClient(clientHandler);
     }
 
@@ -150,7 +154,8 @@ public class Logic extends Thread {
                         this.getPlayer().joinList();
                         break;
                     case ALREADYLOGGEDIN:
-                        this.getPlayer().getViewer().getClientName();
+                        String newName = this.getPlayer().getViewer().getClientName();
+                        this.getPlayer().greeting("Client by "+newName);
                         this.getPlayer().login();
                         break;
                     case LIST:
@@ -164,12 +169,16 @@ public class Logic extends Thread {
                         }
                         this.getPlayer().setupGame();
                         break;
-
+                    case SENDTURN:
+                        String uname = decode.get(1);
+                        this.getPlayer().move(uname);
+                        break;
                     case MOVE:
-                        this.getPlayer().move();
+                        this.getPlayer().sendTurn(this.getPlayer().getUsername());
                         break;
                     case GAMEOVER:
-                        this.getPlayer().endGame(this.player.getClientID());
+                        String reason = decode.get(1);
+                        this.getPlayer().getViewer().endGame(reason);
                         break;
                     case QUIT:
                         this.getPlayer().quit();

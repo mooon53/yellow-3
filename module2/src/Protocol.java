@@ -104,6 +104,9 @@ public class Protocol {
     public static String sendTurn(String text){
         return "SENDTURN~"+text;
     }
+    public static  String sendTurn(){
+        return "SENDTURN";
+    }
     public static String gameover(String reason){
         return "GAMEOVER"+AS+reason;
     }

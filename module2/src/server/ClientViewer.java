@@ -51,8 +51,10 @@ public class ClientViewer extends Thread{
     }
 
 
-    public void endGame(String reason){
-        System.out.println("GAMEOVER~"+reason);
+    public void endGame(String reason){//add winners and draw
+        for(Player player : this.getClient().getPlayers()){
+            System.out.println(player.getName()+" disconnected.");
+        }
     }
 
 }
