@@ -40,7 +40,7 @@ public class GameClient extends Thread {
         view.start();
         this.myBoard = new GameBoard();
         try {
-            socket = new Socket("localhost", viewer.getPort());
+            socket = new Socket(viewer.getIP(), viewer.getPort());
             this.writer = new PrintStream(getSocket().getOutputStream());
             setupLogic();
             setConnection();
