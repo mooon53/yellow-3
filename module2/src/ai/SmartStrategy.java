@@ -5,6 +5,9 @@ import src.game.GameBoard;
 import src.game.Mark;
 
 public class SmartStrategy implements Strategy {
+    //prevents the opponent from winning by blocking a guaranteed win for the opponent in 2 moves
+    //can also see win opportunities 2 moves ahead
+    //should be better in seeing patterns than the average player
     private DumbStrategy random = new DumbStrategy();
     private BasicStrategy basic = new BasicStrategy();
 
