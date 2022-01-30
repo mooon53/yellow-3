@@ -10,48 +10,56 @@ import src.game.HumanPlayer;
 import src.game.Player;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GameClient extends Thread {
+    private Lock lock = new ReentrantLock();
     private Socket socket;
     private BufferedReader reader;
     private PrintStream writer;
-    private Player player;
+    private ArrayList<Player> players = new ArrayList<>();
+    private ComputerPlayer cp = null;
     private String username;
     private String opponentUsername;
     private int clientID;
     private GameBoard myBoard;
     private Thread logic;
-    private GameBoard oppBoard;
     private ClientViewer viewer;
 
     Scanner scanner = new Scanner(System.in);
 
-    public GameClient(int level, int port) {
+    public GameClient(int level) {
         this.viewer = new ClientViewer(this);
+        Thread view = new Thread(viewer);
+        view.start();
         this.myBoard = new GameBoard();
-        this.oppBoard = new GameBoard();
         try {
-            socket = new Socket("localhost", port);
+            socket = new Socket("localhost", viewer.getPort());
             this.writer = new PrintStream(getSocket().getOutputStream());
+            setupLogic();
             if (level == 1) {
                 Strategy strategy = new BasicStrategy();
-                this.player = new ComputerPlayer(strategy);
+                players.add(new ComputerPlayer(strategy));
+                players.add(new HumanPlayer(this.username));
             } else if (level == 2) {
                 Strategy strategy = new DumbStrategy();
-                this.player = new ComputerPlayer(strategy);
+                players.add(new ComputerPlayer(strategy));
+                players.add(new HumanPlayer(this.username));
             } else {
-                setUsername();
-                this.player = new HumanPlayer(this.username);
+                players.add(new HumanPlayer(this.username));
             }
+            setConnection();
         } catch (IOException e) {
             System.out.println("Unable to join port.");
+            Protocol.quit();
         }
-        this.setupLogic();
+
     }
 
     //getters
@@ -60,10 +68,9 @@ public class GameClient extends Thread {
         return socket;
     }
 
-    //@requires player!=null;
-    //@pure;
-    public Player getPlayer() {
-        return this.player;
+
+    public ArrayList<Player> getPlayers() {
+        return players;
     }
 
     //@pure;
@@ -91,19 +98,6 @@ public class GameClient extends Thread {
         return this.logic;
     }
 
-    //commands related connection
-    public void successConnection(String state) {
-        viewer.checkConnection();
-        viewer.announce(state);
-        this.setupGame();
-    }
-
-    public void failedConnection(String state) {
-        viewer.checkConnection();
-        viewer.announce(state);
-        this.username = "-";
-        this.setConnection();
-    }
 
     public void setSides(String[] users) {
         if (users[0].equals(getUsername())) {
@@ -116,15 +110,15 @@ public class GameClient extends Thread {
     }
 
 
-    public void sendMove(int currentPlayer) throws IOException {
+    public void sendMove(int currentPlayer){
         int[] position=null;
         if (currentPlayer == clientID) {
-            position = this.getPlayer().turn(this.myBoard);
-            String command = Protocol.move(position[0], position[1], position[2]);
+            position = this.players.get(currentPlayer).turn(this.myBoard);
+            String command = Protocol.move(position[0], position[1]);
             writer.println(command);
             writer.flush();
         }
-        if(position!=null && this.player instanceof ComputerPlayer){
+        if(position!=null && cp!=null){
             try{
                 Thread.sleep(200);
             } catch (InterruptedException e) {
@@ -142,38 +136,90 @@ public class GameClient extends Thread {
     public void endGame(int winnerID) {
         String reason;
         if (winnerID == clientID) {
-            viewer.endGame(getUsername(), "WINNER");
+            viewer.endGame("WINNER");
         } else if(myBoard.isFull()){
-            viewer.endGame(getUsername(),"DRAW");
+            viewer.endGame("DRAW");
+        } else{
+            viewer.endGame("DISCONNECT");
         }
     }
 
-    public void setupLogic() {
-        this.logic = new Logic(this);
-        new Thread(logic).start();
+    public synchronized void setupLogic() {
+        Logic logicc = new Logic(this);
+        this.logic = new Thread(logicc);
+        this.logic.start();
+        System.out.println("HEY NEW CLIENT");
     }
 
 
-    public void setUsername() {
-        System.out.println(">Enter your username: ");
-        this.username = scanner.nextLine();
-    }
+    public synchronized void setConnection(){
 
-    public void setConnection(){
         String username = viewer.getClientName();
         this.username = username;
-        String command = Protocol.login(username);
-        writer.println(command);
-        writer.flush();
+        viewer.checkConnection();
+        greeting("Client by "+username);
+
+
     }
 
     public void setupGame(){
-        int size = 2;
+        ArrayList<Player> players = new ArrayList<>();
+        players.add(new HumanPlayer(opponentUsername));
+        players.add(new HumanPlayer(username));
+        Game game = new Game(players.get(0), players.get(1));
         String command = Protocol.newGame(getUsername(), getOpponentUsername());
         writer.println(command);
         writer.flush();
     }
 
+    //logic queries
+    public synchronized void greeting(String name){
+        String command = Protocol.greeting(name);
+        System.out.println("GREETING");
+        writer.println(command);
+        writer.flush();
+    }
+    public synchronized void login(){
+        String command = Protocol.login(this.username);
+        writer.println(command);
+        writer.flush();
+    }
+    public void quit(){
+        String command = Protocol.quit();
+        writer.println(command);
+        writer.flush();
+    }
+
+    public synchronized void joinList(){
+        String command = Protocol.list();
+        writer.println(command);
+        writer.flush();
+    }
+
+    public synchronized void joinQueue(){
+        System.out.println("Play a game? 0-yes 1-no");
+        int choice = Integer.parseInt(scanner.next());
+        if(choice==0){
+            String command = Protocol.queue();
+            writer.println(command);
+            writer.flush();
+        } else if(choice==1){
+            String command = Protocol.quit();
+            writer.println(command);
+            writer.flush();
+        }
+    }
+
+    public void ping(){
+        String command = Protocol.ping();
+        writer.println(command);
+        writer.flush();
+    }
+    public void pong(){
+        String command = Protocol.pong();
+        writer.println(command);
+        writer.flush();
+    }
 
     public void run() {
         try {
@@ -182,6 +228,7 @@ public class GameClient extends Thread {
             System.out.println("Big oops..");
         }
     }
+
 }
 
 

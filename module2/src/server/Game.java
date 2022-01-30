@@ -2,28 +2,31 @@ package src.server;
 
 import src.Protocol;
 import src.game.GameBoard;
+import src.game.Mark;
+import src.game.Player;
 
 import java.util.ArrayList;
 import java.util.Scanner;
 
 public class Game {
     public static final int NUMBER_OF_PLAYERS = 2;
-    private ArrayList<ClientHandler> players;
+    private ArrayList<Player> players;
     private GameBoard board;
     private int indexOfCurrentPlayer = 0;
+    private Mark mark;
     Scanner scanner = new Scanner(System.in);
 
-    public Game(ClientHandler player) {
+    public Game(Player player1, Player player2) {
         this.players = new ArrayList<>();
-        this.board = new GameBoard();
-        this.players.add(player);
-        System.out.println("Your mark is: " + player.getMark().toString());
+        this.players.add(player1);
+        this.players.add(player2);
+        setupBoard();
     }
 
     //getters
 
     //@pure;
-    public ArrayList<ClientHandler> getPlayers() {
+    public ArrayList<Player> getPlayers() {
         return players;
     }
 
@@ -32,8 +35,8 @@ public class Game {
     public String[] getUsernames() {
         String[] usernames = new String[players.size()];
         int i = 0;
-        for (ClientHandler player : players) {
-            usernames[i] = player.getUsername();
+        for (Player player : players) {
+            usernames[i] = player.getName();
             i++;
         }
         return usernames;
@@ -57,12 +60,14 @@ public class Game {
     }
 
     //queries
-    public void addPlayer(ClientHandler client) {
-        this.players.add(client);
-        if (this.isLobbyFull()) {
-            String command = Protocol.newGame(players.get(0).getUsername(), players.get(1).getUsername());
-            this.sendMessage(command);
+
+    public void setMark(Player player, int index) {
+        if (index == 1) {
+            this.mark = Mark.XX;
+        } else {
+            this.mark = Mark.OO;
         }
+
     }
 
     public boolean isLobbyFull() {
@@ -74,12 +79,12 @@ public class Game {
     }
 
 
-    public void play() {
-
+    public void setupBoard() {
+        this.board = new GameBoard();
     }
 
     private void update() {
-        ClientHandler winner;
+        Player winner;
         if (win()) {
             winner = isWinner(this.indexOfCurrentPlayer) ? players.get(0) : players.get(1);
             System.out.println(winner.getName() + "is the king of Pentago today!");
@@ -106,41 +111,20 @@ public class Game {
             if (board.isFull()) {
                 reason = "DRAW";
                 command = Protocol.gameover(reason);
-                sendMessage(command);
+                //sendMessage(command);
             } else if (win()) {
                 reason = "VICTORY";
                 command = Protocol.gameover(reason);
-                sendMessage(command);
+                //sendMessage(command);
             }
-            closeGame();
-            closeConnection();
             return true;
         } else {
             return false;
         }
     }
 
-    public void disconnect() {
-        String reason = Protocol.gameover("DISCONNECT");
-        Protocol.quit();
-        sendMessage(reason);
 
-    }
 
-    public void closeConnection() {
-        this.getPlayers().get(0).close();
-        this.getPlayers().get(1).close();
-    }
-
-    public void sendTurn() {
-        String command = Protocol.ping();
-        this.sendMessage(command);
-    }
-
-    public void getTurn(){
-        String command = Protocol.pong();
-        this.sendMessage(command);
-    }
 
     /**
      * @return true if one of players is a winner
@@ -160,14 +144,8 @@ public class Game {
                 board.winIrregularDiagonal(players.get(indexOfCurrentPlayer).getMark());
     }
 
-    public void closeGame() {
-        this.getPlayers().get(0).close();
-        this.getPlayers().get(1).close();
-    }
 
-    public void sendMessage(String msg){
-        players.get(0).sendMessage(msg);
-        players.get(1).sendMessage(msg);
-    }
+
+
 
 }

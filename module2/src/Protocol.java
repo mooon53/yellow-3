@@ -2,8 +2,7 @@ package src;
 
 import src.game.Mark;
 
-import java.util.ArrayList;
-import java.util.Objects;
+import java.util.*;
 
 public class Protocol {
     /**
@@ -37,29 +36,7 @@ public class Protocol {
         QUEUE; //waiting queue of players
     }
 
-    /**
-     * Code array of objects into protocol format to use stream exchange data
-     *
-     * @param objects the array to be encoded to protocol
-     * @return string to be sent in format of protocol
-     */
-    public static String protocolMessage(Object[] objects) {
-        StringBuilder stringBuilder = new StringBuilder();
 
-        for (int i = 0; i < objects.length; i++) {
-            Object object = objects[i];
-            if (object.getClass().isArray()) {
-                stringBuilder.append(encodeArray((Object[]) object));
-            } else {
-                stringBuilder.append(object);
-            }
-
-            if (i != objects.length - 1) {
-                stringBuilder.append(CS);
-            }
-        }
-        return stringBuilder.toString();
-    }
 
     /**
      * Transform received string to protocol format
@@ -67,17 +44,9 @@ public class Protocol {
      * @param Pstring protocol format string
      * @return
      */
-    public static ArrayList<Object> decodeProtocolMessage(String Pstring) {
-        ArrayList<Object> objects = new ArrayList<>();
-        String[] commands = parseCommands(Pstring);
-        for (String string : commands) {
-            if (string.contains(AS)) {
-                objects.add(parseArr(string));
-            } else {
-                objects.add(string);
-            }
-        }
-        return objects;
+    public static List<String> decodeProtocolMessage(String Pstring) {
+        List<String> list = Arrays.asList(Pstring.split(AS));
+        return list;
     }
 
 
@@ -89,11 +58,11 @@ public class Protocol {
         return line.strip().split(AS);
     }
 
-    public static String encodeArray(Object[] array){
+    public static String encodeArray(String[] array){
         StringBuilder stringBuilder = new StringBuilder();
 
         for(int i = 0; i< array.length; i++){
-            stringBuilder.append(array[i].toString());
+            stringBuilder.append(array[i]);
             if (i != array.length-1){
                 stringBuilder.append(AS);
             }
@@ -103,58 +72,70 @@ public class Protocol {
     }
 
 
-   public static String greeting(String[] params ){
-        if (params != null){
-            return protocolMessage(new Object[]{CommandsIdentifier.HELLO, params});
-        }
-        return CommandsIdentifier.HELLO.toString();
-    }
-    public static String greeting(String username){
-        return greeting(new String[]{username});
+
+    public static String greeting(String text){
+        //System.out.println("HELLO"+AS+text);
+        return "HELLO"+AS+text;
     }
 
-    public static String error(String[] params){
-       if(params!=null){
-           return protocolMessage(new Object[]{CommandsIdentifier.ERROR, params});
-       }
-       return CommandsIdentifier.ERROR.toString();
-    }
 
     public static String error (String message){
-        return error(new String[]{message});
+        return "ERROR~"+message;
     }
 
     public static String error(){
-        return error((String[]) null);
+        return "ERROR";
     }
 
     //----------------------------------------------------
     public static String newGame(String player1, String player2){
-        return protocolMessage(new Object[]{CommandsIdentifier.NEWGAME, player1, player2});
+        return "NEWGAME~"+player1+"~"+player2;
     }
     public static String login(String username){
-        return protocolMessage(new Object[]{CommandsIdentifier.LOGIN, username});
+        return "LOGIN~"+username;
     }
-    public static String move(int index, int rotation, int side){
-        return protocolMessage(new Object[]{CommandsIdentifier.MOVE, index, rotation, side});
+    public static String login(){
+        return "LOGIN";
+    }
+    public static String move(int index, int rotation){
+        return "MOVE~"+index+AS+rotation;
     }
     public static String gameover(String reason){
-        return protocolMessage(new Object[]{CommandsIdentifier.GAMEOVER, reason});
+        return "GAMEOVER"+AS+reason;
     }
-    public static String list(String[] names){
-        return protocolMessage(new Object[]{CommandsIdentifier.LIST, names});
+    public static String list(ArrayList<String> names){
+        String res = "LIST";
+        for(String name : names){
+            res+=(AS+name);
+        }
+        return res;
+    }
+
+    public static String list(){
+        return "LIST";
+    }
+
+    public static String queue(){
+        return "QUEUE";
+    }
+    public static String queue(String username){
+        return "QUEUE"+AS+username;
+    }
+
+    public static String alreadyLoggedIn(){
+        return "ALREADYLIGGEDIN";
     }
 
     public static String quit(){
-        return protocolMessage(new Object[]{CommandsIdentifier.QUIT});
+        return "QUIT";
     }
 
     public static String ping(){
-        return protocolMessage(new Object[]{CommandsIdentifier.PING});
+        return "PING";
     }
 
     public static String pong(){
-        return protocolMessage(new Object[]{CommandsIdentifier.PONG});
+        return "PONG";
     }
 
 }

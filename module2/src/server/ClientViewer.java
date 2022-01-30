@@ -1,9 +1,14 @@
 package src.server;
 
+import src.game.Player;
+
 import java.util.Scanner;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class ClientViewer extends Thread{
     private GameClient client;
+    private Lock lock = new ReentrantLock();
     Scanner scanner = new Scanner(System.in);
 
     public  ClientViewer(GameClient client){
@@ -18,9 +23,9 @@ public class ClientViewer extends Thread{
 
 
     //methods
-    public String getClientName(){
+    public synchronized String getClientName(){
         System.out.println("Username: ");
-        String name = scanner.nextLine();
+        String name = scanner.next();
         return name;
     }
 
@@ -46,8 +51,9 @@ public class ClientViewer extends Thread{
         }
     }
 
-    public void endGame(String username, String reason){
-        System.out.println("GAMEOVER~"+username+"~"+reason);
+
+    public void endGame(String reason){
+        System.out.println("GAMEOVER~"+reason);
     }
 
 }
