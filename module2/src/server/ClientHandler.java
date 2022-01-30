@@ -21,7 +21,7 @@ public class ClientHandler extends Thread {
     private PrintStream writer;
     private Thread logic;
     private int clienthandlerID;
-    private boolean yourTurn=true;
+    private boolean yourTurn = true;
 
 
     public ClientHandler(Socket socket, GameServer server) {
@@ -43,8 +43,8 @@ public class ClientHandler extends Thread {
         return this.username;
     }
 
-    public void setUsername(String username){
-       this.username = username;
+    public void setUsername(String username) {
+        this.username = username;
     }
 
     //@pure;
@@ -76,8 +76,7 @@ public class ClientHandler extends Thread {
     //queries
 
 
-
-    public synchronized void setupLogic(){
+    public synchronized void setupLogic() {
         try {
             logic = new Logic(this);
             this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
@@ -88,35 +87,16 @@ public class ClientHandler extends Thread {
 
     }
 
-    public void sendMessage(String message){
-        if(message!=null){
+    public void sendMessage(String message) {
+        if (message != null) {
             writer.println(message);
-            writer.flush();}
-
-    }
-
-
-
-
-
-
-    public void makeMove(int index, int rotation) {
-        if (this.game.gameOver() == false) {
-            int player = this.game.getIndexOfCurrentPlayer();
-            GameBoard currentBoard = this.game.getBoard();
-            currentBoard.setField(index, getMark());
-            int choice = encodeRotation(rotation)[0];
-            int side = encodeRotation(rotation)[1];
-            if (side == 0) {
-                this.game.getBoard().rotateRight(choice);
-            } else if (side == 1) {
-                this.game.getBoard().rotateLeft(choice);
-            }
-            this.game.next();
+            writer.flush();
         }
 
-
     }
+
+
+
 
 
     public void close() {
@@ -134,44 +114,6 @@ public class ClientHandler extends Thread {
 
 
 
-    public int[] encodeRotation(int index) {
-        int[] result = new int[2];
-        switch (index) {
-            case 0:
-                result[0] = 0;
-                result[1] = 0;
-                break;
-            case 1:
-                result[0] = 0;
-                result[1] = 1;
-                break;
-            case 2:
-                result[0] = 1;
-                result[1] = 0;
-                break;
-            case 3:
-                result[0] = 1;
-                result[1] = 1;
-                break;
-            case 4:
-                result[0] = 2;
-                result[1] = 0;
-                break;
-            case 5:
-                result[0] = 2;
-                result[1] = 1;
-                break;
-            case 6:
-                result[0] = 3;
-                result[1] = 0;
-                break;
-            case 7:
-                result[0] = 3;
-                result[1] = 1;
-                break;
-        }
-        return result;
-    }
 
     public void shutDown() {
         if (this.getGame() != null) {

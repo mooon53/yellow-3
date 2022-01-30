@@ -101,12 +101,14 @@ public class Logic extends Thread {
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
                         int rotation = Integer.parseInt(decode.get(2));
-                        com = this.getClientHandler().getServer().move(move, rotation);
+                        com = this.getClientHandler().getServer().makeMove(move, rotation);
                         this.getClientHandler().sendMessage(com);
                         break;
                     case SENDTURN:
                         String nameToTurn = decode.get(1);
-                        this.getClientHandler().getServer().sendTurn(nameToTurn);
+                        com = this.getClientHandler().getServer().sendTurn(nameToTurn);
+                        System.out.println(com);
+                        this.getClientHandler().sendMessage(com);
                         break;
                     case QUIT:
                         com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
@@ -169,8 +171,7 @@ public class Logic extends Thread {
                         this.getPlayer().setupGame();
                         break;
                     case SENDTURN:
-                        String uname = decode.get(1);
-                        this.getPlayer().move(uname);
+                        this.getPlayer().move();
                         break;
                     case MOVE:
                         this.getPlayer().sendTurn(this.getPlayer().getUsername());

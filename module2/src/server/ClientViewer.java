@@ -1,7 +1,10 @@
 package src.server;
 
+import src.Protocol;
 import src.game.Player;
 
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -32,6 +35,18 @@ public class ClientViewer extends Thread{
         System.out.println("Join port: ");
         int port = scanner.nextInt();
         return  port;
+    }
+    public InetAddress getInetAddress(){
+        InetAddress inetAddress=null;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Join host: ");
+        String string = scanner.next();
+        try {
+            inetAddress= InetAddress.getByName(string);
+        } catch (UnknownHostException e) {
+            System.out.println(Protocol.error("unknown host"));
+        }
+        return inetAddress;
     }
 
     public void displayOpponentUsername(){
