@@ -30,18 +30,18 @@ public class SmartStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j / 4 == 1) {
-                        copy.rotateLeft(j % 4);
+                    if (j % 2 == 1) {
+                        copy.rotateLeft(j / 2);
                     } else {
-                        copy.rotateRight(j);
+                        copy.rotateRight(j / 2);
                     }
                     //this prevents us from winning, if it's possible
                     int[] basicMove = basic.determineMove(copy, mark.other());
                     copy.setField(basicMove[0], mark);
-                    if (basicMove[1] / 4 == 1) {
-                        copy.rotateLeft(basicMove[1] % 4);
+                    if (basicMove[1] % 2 == 1) {
+                        copy.rotateLeft(basicMove[1] / 2);
                     } else {
-                        copy.rotateRight(basicMove[1]);
+                        copy.rotateRight(basicMove[1] / 2);
                     }
                     if (basic.determineWinningMove(copy, mark) != null) {
                         return new int[]{i, j};
@@ -66,10 +66,10 @@ public class SmartStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j / 4 == 1) { //rotate to the left if j > 3
-                        copy.rotateLeft(j % 4);
+                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                        copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
-                        copy.rotateRight(j);
+                        copy.rotateRight(j / 2);
                     }
                     if (determineWinningMove(copy, mark.other()) == null) {
                         return new int[]{i, j};
@@ -94,18 +94,18 @@ public class SmartStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark.other());
-                    if (j / 4 == 1) { //rotate to the left if j > 3
-                        copy.rotateLeft(j % 4);
+                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                        copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
-                        copy.rotateRight(j);
+                        copy.rotateRight(j / 2);
                     }
                     //next, execute basicStrategy move on the copy board
                     int[] basicMove = basic.determineMove(copy, mark);
                     copy.setField(basicMove[0], mark);
-                    if (basicMove[1] / 4 == 1) {
-                        copy.rotateLeft(basicMove[1] % 4);
+                    if (basicMove[1] % 2 == 1) {
+                        copy.rotateLeft(basicMove[1] / 2);
                     } else {
-                        copy.rotateRight(basicMove[1]);
+                        copy.rotateRight(basicMove[1] / 2);
                     }
                     //see if the opponent has a winning move now
                     winningMove = basic.determineWinningMove(copy, mark.other());

@@ -20,10 +20,10 @@ public class BasicStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j / 4 == 1) { //rotate to the left if j > 3
-                        copy.rotateLeft(j % 4);
+                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                        copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
-                        copy.rotateRight(j);
+                        copy.rotateRight(j / 2);
                     }
                     if (copy.isWinner(mark)) {
                         return new int[]{i, j};
@@ -49,10 +49,10 @@ public class BasicStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j / 4 == 1) { //rotate to the left if j > 3
-                        copy.rotateLeft(j % 4);
+                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                        copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
-                        copy.rotateRight(j);
+                        copy.rotateRight(j / 2);
                     }
                     if (determineWinningMove(copy, mark.other()) == null) {
                         return new int[]{i, j};

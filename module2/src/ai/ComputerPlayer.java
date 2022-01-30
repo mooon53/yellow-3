@@ -6,7 +6,6 @@ import src.game.Player;
 
 public class ComputerPlayer extends Player {
     private Strategy strategy;
-    private int[] moveList;
 
     public ComputerPlayer(Strategy strategy, boolean turn) {
         super(strategy.getName() + "-", turn);
@@ -15,9 +14,7 @@ public class ComputerPlayer extends Player {
 
     @Override
     public int[] turn(GameBoard board){
-        moveList = strategy.determineMove(board, Mark.XX);
-        //since chooseMove is called first in the makeMove method, this works
-        return moveList;
+        return strategy.determineMove(board, Mark.XX);
     }
 
 
