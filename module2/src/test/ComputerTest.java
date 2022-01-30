@@ -1,9 +1,5 @@
 package src.test;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertTrue;
-
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
@@ -11,6 +7,8 @@ import org.junit.jupiter.api.Disabled;
 import src.ai.*;
 import src.game.GameBoard;
 import src.game.Mark;
+
+import static org.junit.jupiter.api.Assertions.*;
 
 /**
  * A test file with toString methods to see AI behaviour when they play against each other
@@ -39,7 +37,7 @@ public class ComputerTest {
         playGame();
     }
 
-
+    @Disabled
     @Test
     public void testSmartStrategy() {
         strategy = new SmartStrategy();
@@ -65,6 +63,25 @@ public class ComputerTest {
             System.out.println();
             System.out.println();
         }
+    }
+
+
+
+    @Test
+    public void testSmartWinningMove() {
+        strategy = new SmartStrategy();
+        board.setField(7, Mark.XX);
+        board.setField(13, Mark.XX);
+        board.setField(19, Mark.XX);
+        var move = strategy.determineMove(board, Mark.OO);
+        board.setField(move[0], Mark.OO);
+        if (move[1] % 2 == 1) {
+            board.rotateLeft(move[1] / 2);
+        } else {
+            board.rotateRight(move[1] / 2);
+        }
+        System.out.println(board.toString());
+        assertNotSame(board.getField(25), Mark.EMPTY);
     }
 
 
