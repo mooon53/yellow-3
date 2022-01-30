@@ -2,12 +2,11 @@ package src.game;
 
 public abstract class Player {
     private String name;
-    private Mark mark;
     private boolean yourTurn;
+    private Mark mark;
 
-    public Player(String name, boolean turn){
+    public Player(String name){
         this.name = name;
-        this.yourTurn = turn;
     }
 
     public String getName() {
@@ -16,13 +15,12 @@ public abstract class Player {
 
     public abstract int[] turn(GameBoard board);
 
-    public void setMark(int index) {
+    public void assignMark(int index) {
         if (index == 1) {
-            this.mark = Mark.XX;
+            this.mark= Mark.XX;
         } else {
-            this.mark = Mark.OO;
+            this.mark= Mark.OO;
         }
-
     }
     public boolean getTurn(){
         return yourTurn;
@@ -43,6 +41,6 @@ public abstract class Player {
     }
 
     public Mark getMark() {
-        return mark;
+        return this.mark;
     }
 }

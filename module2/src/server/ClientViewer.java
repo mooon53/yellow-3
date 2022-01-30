@@ -2,6 +2,9 @@ package src.server;
 
 import src.game.Player;
 
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -34,6 +37,18 @@ public class ClientViewer extends Thread{
         return  port;
     }
 
+    public InetAddress getIP(){
+        System.out.println("Join server:");
+        while(true) {
+            try {
+                String address = scanner.nextLine();
+                return InetAddress.getByName(address);
+            } catch (UnknownHostException e) {
+                System.out.println("Unknown host, try again:");
+            }
+        }
+    }
+
     public void displayOpponentUsername(){
         System.out.println("Your opponent: "+getClient().getOpponentUsername());
     }
@@ -42,17 +57,11 @@ public class ClientViewer extends Thread{
         System.out.println(msg);
     }
 
-    public void checkConnection(){
-        if(this.client.getSocket().isConnected()){
-            System.out.println("Good Connection");
-        } else{
-            System.out.println("No connection.");
+
+    public void endGame(String reason){//add winners and draw
+        for(Player player : this.getClient().getPlayers()){
+            System.out.println(player.getName()+" disconnected.");
         }
-    }
-
-
-    public void endGame(String reason){
-        System.out.println("GAMEOVER~"+reason);
     }
 
 }

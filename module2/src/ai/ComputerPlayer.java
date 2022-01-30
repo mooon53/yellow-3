@@ -7,8 +7,8 @@ import src.game.Player;
 public class ComputerPlayer extends Player {
     private Strategy strategy;
 
-    public ComputerPlayer(Strategy strategy, boolean turn) {
-        super(strategy.getName() + "-", turn);
+    public ComputerPlayer(Strategy strategy) {
+        super(strategy.getName());
         this.strategy = strategy;
     }
 
