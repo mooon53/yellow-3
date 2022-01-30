@@ -68,4 +68,20 @@ public class ComputerTest {
     }
 
 
+    @Test
+    public void testSmartWinningMove() {
+        strategy = new SmartStrategy();
+        board.setField(7, Mark.XX);
+        board.setField(13, Mark.XX);
+        board.setField(19, Mark.XX);
+        var move = strategy.determineMove(board, Mark.OO);
+        board.setField(move[0], Mark.OO);
+        if (move[1] % 2 == 1) {
+            board.rotateLeft(move[1] / 2);
+        } else {
+            board.rotateRight(move[1] / 2);
+        }
+        System.out.println(board.toString());
+        assertNotSame(board.getField(25), Mark.EMPTY);
+    }
 }

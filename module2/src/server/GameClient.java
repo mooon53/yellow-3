@@ -41,7 +41,7 @@ public class GameClient extends Thread {
         view.start();
         this.myBoard = new GameBoard();
         try {
-            socket = new Socket(viewer.getInetAddress(), viewer.getPort());
+            socket = new Socket("localhost", viewer.getPort());
             this.writer = new PrintStream(getSocket().getOutputStream());
             setupLogic();
             setConnection();
@@ -128,6 +128,10 @@ public class GameClient extends Thread {
 
     }
 
+    public void printBoard() {
+        myBoard.toString();
+    }
+
     public synchronized void setupLogic() {
         Logic logicc = new Logic(this);
         this.logic = new Thread(logicc);
@@ -153,10 +157,9 @@ public class GameClient extends Thread {
         player2.assignMark(1);
         Mark mark2 = player2.getMark();
         this.game = new Game(player1, player2);
-        System.out.println("CHEKK: " + player1.getName() + mark1);
-        System.out.println("CHEKK: " + player2.getName() + mark2);
+        System.out.println("CHEKK: "+player1.getName()+mark1);
+        System.out.println("CHEKK: "+player2.getName()+mark2);
         sendTurn(player1.getName());
-        System.out.println(game.getBoard().toString());
     }
 
     public synchronized void sendTurn(String username) {
@@ -166,17 +169,20 @@ public class GameClient extends Thread {
 
     }
 
-    public synchronized void move() {
+    public synchronized void move(String uname) {
         String com = null;
         if (!game.gameOver()) {
-            int[] move = players.get(0).turn(game.getBoard());
-            com = Protocol.move(move[0], move[1]);
-            writer.println(com);
-            writer.flush();
-            game.update();
-            System.out.println(game.getBoard().toString());
-            game.next();
-            game.gameOver();
+            if (players.get(0).getName().equals(uname)) {
+                int[] move = players.get(0).turn(game.getBoard());
+                com = Protocol.move(move[0], move[1]);
+                writer.println(com);
+                writer.flush();
+                game.update();
+                game.printBoard();
+                game.next();
+                game.gameOver();
+
+            }
         } else {
             com = Protocol.quit();
             writer.println(com);
@@ -186,7 +192,7 @@ public class GameClient extends Thread {
 
     //logic queries
     public synchronized void greeting(String name) {
-        String command = Protocol.greeting("Client by " + name);
+        String command = Protocol.greeting("Client by "+name);
         writer.println(command);
         writer.flush();
     }
