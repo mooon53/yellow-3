@@ -148,7 +148,7 @@ public class GameServer extends Thread implements Server {
 
     public String createGame() {
         String command = null;
-        if (players.size() == 2) {
+        if (queue.size() == 2) {
             game = new Game(playerSet.get(0), playerSet.get(1));
             game.getBoard();
             games.add(game);
@@ -172,7 +172,7 @@ public class GameServer extends Thread implements Server {
         } else if (side == 1) {
             this.game.getBoard().rotateLeft(choice);
         }
-        this.game.next();
+        System.out.println(this.game.getBoard().toString());
         return Protocol.move(index, rotation);
     }
 
@@ -223,7 +223,7 @@ public class GameServer extends Thread implements Server {
                 this.turn = 1;
                 this.currentPlayer = player;
                 break;
-            } else if (this.turn == 1 && player.getName().equals(username)&& players.get(player).equals(Mark.OO)) {
+            } else if (this.turn == 1 && !player.getName().equals(username)&& players.get(player).equals(Mark.OO)) {
                 com = Protocol.sendTurn();
                 this.currentPlayer = player;
                 this.turn = 0;

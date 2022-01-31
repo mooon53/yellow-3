@@ -5,6 +5,7 @@ import src.game.Player;
 
 import java.net.InetAddress;
 import java.net.UnknownHostException;
+import java.sql.SQLOutput;
 import java.util.Scanner;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
@@ -47,6 +48,12 @@ public class ClientViewer extends Thread{
             System.out.println(Protocol.error("unknown host"));
         }
         return inetAddress;
+    }
+
+    public int level(){
+        System.out.println("Choose type of game:\n -0: multiplayer \n -1: singleplayer(easy) \n -2: singleplayer(medium)");
+        int level = scanner.nextInt();
+        return level;
     }
 
     public void displayOpponentUsername(){
