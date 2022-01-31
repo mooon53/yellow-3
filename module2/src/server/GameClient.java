@@ -9,20 +9,14 @@ import src.game.GameBoard;
 import src.game.HumanPlayer;
 import src.game.Mark;
 import src.game.Player;
-
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class GameClient extends Thread {
-    private Lock lock = new ReentrantLock();
     private Socket socket;
-    private BufferedReader reader;
     private PrintStream writer;
     private ArrayList<Player> players;
     private int level;
@@ -51,7 +45,6 @@ public class GameClient extends Thread {
             setConnection();
         } catch (IOException e) {
             System.out.println("Unable to join port.");
-            Protocol.quit();
         }
 
     }
@@ -80,22 +73,8 @@ public class GameClient extends Thread {
         return opponentUsername;
     }
 
-    //@pure;
-    public GameBoard getMyBoard() {
-        return myBoard;
-    }
 
-    //@pure;
-    public int getClientID() {
-        return clientID;
-    }
-
-    //@pure;
-    public Thread getLogic() {
-        return this.logic;
-    }
-
-    //set player - matk - ID connection
+    //set player - mark - ID connection
     public void setSides() {
         if (this.players.get(0).getName().equals(getUsername())) {
             this.clientID = 0;
@@ -156,10 +135,6 @@ public class GameClient extends Thread {
     public synchronized void setupGame() {
         Player player1 = null;
         switch(this.level){
-            case 0:
-                player1 = new HumanPlayer(getUsername());
-                player1.assignMark(0);
-                break;
             case 1:
                 Strategy strategy = new DumbStrategy();
                 player1 = new ComputerPlayer(strategy);
