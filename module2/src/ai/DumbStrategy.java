@@ -4,6 +4,7 @@ package src.ai;
 import src.game.Board;
 import src.game.GameBoard;
 import src.game.Mark;
+import src.server.Game;
 
 public class DumbStrategy implements Strategy{
     //A strategy that selects random moves
@@ -14,7 +15,7 @@ public class DumbStrategy implements Strategy{
 
     @Override
     public int[] determineMove(Board board, Mark mark) {
-        int[] moveList = new int[GameBoard.DIM^2];
+        int[] moveList = new int[GameBoard.DIM* GameBoard.DIM];
         int i = 0;
         for (int j = 0; board.isField(j); j++) {
             if (board.getField(j) == Mark.EMPTY) { //only adds it to the moveList if the move is valid
