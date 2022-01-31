@@ -218,16 +218,13 @@ public class GameServer extends Thread implements Server {
     public synchronized String sendTurn(String username) {
         String com = null;
         for (Player player : this.playerSet) {
-            if (this.turn == 0 && player.getName().equals(username) && players.get(player).equals(Mark.XX)) {
+            if (player.getName().equals(username) && players.get(player).equals(Mark.XX)) {
                 com = Protocol.sendTurn();
-                this.turn = 1;
                 this.currentPlayer = player;
-                break;
-            } else if (this.turn == 1 && !player.getName().equals(username)&& players.get(player).equals(Mark.OO)) {
+            } else if (player.getName().equals(username)&& players.get(player).equals(Mark.OO)) {
                 com = Protocol.sendTurn();
                 this.currentPlayer = player;
                 this.turn = 0;
-                break;
             }
         }
         return com;
