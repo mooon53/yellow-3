@@ -147,14 +147,16 @@ public class Logic extends Thread {
 
             List<String> decode = Protocol.decodeProtocolMessage(protocolMessage);
             String command = decode.get(0);
-            if (!command.equals(null)) {
+            if (command != null) {
                 Protocol.CommandsIdentifier commandsIdentifier = Protocol.CommandsIdentifier.valueOf(command);
+                System.out.println(decode);
                 switch (commandsIdentifier) {
                     case LOGIN:
-                        this.getPlayer().greeting(this.getPlayer().getUsername());
+                        this.getPlayer().joinList();
+                        //this.getPlayer().greeting(this.getPlayer().getUsername());
                         break;
                     case HELLO:
-                        this.getPlayer().joinList();
+                        this.getPlayer().login();
                         break;
                     case ALREADYLOGGEDIN:
                         this.getPlayer().getViewer().announce("It seems such username already taken. Please, choose another one.^^");
@@ -165,14 +167,13 @@ public class Logic extends Thread {
                         break;
                     case NEWGAME:
                         if(decode.get(1).equals(this.getPlayer().getUsername())){
-                            this.getPlayer().setOpponentUsername(decode.get(2));
-                        } else{
-                            this.getPlayer().setOpponentUsername(decode.get(1));
+                            this.getPlayer().setupGame(0);
+                        } else if (decode.get(2).equals(this.getPlayer().getUsername())){
+                            this.getPlayer().setupGame(1);
                         }
-                        this.getPlayer().setupGame();
                         break;
                     case SENDTURN:
-                        this.getPlayer().move();
+                        //this.getPlayer().move();
                         break;
                     case SENDBOARD:
                         String board = decode.get(1).replace('!', '\n');
@@ -180,7 +181,7 @@ public class Logic extends Thread {
                         this.getPlayer().sendTurn(this.getPlayer().getUsername());
                         break;
                     case MOVE:
-                        this.getPlayer().sendBoard();
+                        this.getPlayer().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
                         break;
                     case GAMEOVER:
                         String reason = decode.get(1);

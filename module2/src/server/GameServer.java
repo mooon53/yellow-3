@@ -103,8 +103,16 @@ public class GameServer extends Thread implements Server {
 
 
     public String removeClient(ClientHandler clientHandler) {
-        this.clientHandlers.remove(clientHandler);
-        return Protocol.gameover("DISCONNECT", clientHandlers.get(0).getUsername());
+        clientHandlers.remove(clientHandler);
+        queue.remove(clientHandler);
+        String command = Protocol.gameover("DISCONNECT", clientHandlers.get(0).getUsername());
+        if (!games.isEmpty()) {
+            for (ClientHandler ch : clientHandlers) { //should actually be currentPlayers only
+                ch.sendMessage(command);
+                games.remove(game); //should be current game only
+            }
+        }
+        return command;
     }
 
     @Override
@@ -145,7 +153,7 @@ public class GameServer extends Thread implements Server {
         } else if (state == 1) {
             queue.add(clientHandler);
             for (ClientHandler ch : this.queue) {
-                Player player = new HumanPlayer(ch.getUsername());
+                Player player = new HumanPlayer(ch.getUsername()); //why create humanplayer?
                 playerSet.add(player);
                 player.assignMark(id);
                 id = 1;
@@ -214,7 +222,7 @@ public class GameServer extends Thread implements Server {
             for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
                 clientHandler.sendMessage(gameOver);
             }
-            games.remove(game); //not sure if needed
+            games.remove(game);
         }
         for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
             clientHandler.sendMessage(command);

@@ -121,9 +121,9 @@ public class ClientHandler extends Thread {
             this.getServer().removeGame(this.getGame());
         }
         if (this.getUsername() != null) {
-            writer.close();
             this.getServer().removeClient(this);
         }
+        close();
     }
 
 
