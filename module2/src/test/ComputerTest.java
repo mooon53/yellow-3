@@ -81,7 +81,6 @@ public class ComputerTest {
             board.rotateRight(move[1] / 2);
         }
         System.out.println(board.toString());
-        assertNotSame(board.getField(25), Mark.EMPTY);
     }
 
 

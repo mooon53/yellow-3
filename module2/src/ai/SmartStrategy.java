@@ -37,7 +37,7 @@ public class SmartStrategy implements Strategy {
                     }
                     //this prevents us from winning, if it's possible
                     int[] basicMove = basic.determineMove(copy, mark.other());
-                    copy.setField(basicMove[0], mark);
+                    copy.setField(basicMove[0], mark.other());
                     if (basicMove[1] % 2 == 1) {
                         copy.rotateLeft(basicMove[1] / 2);
                     } else {
