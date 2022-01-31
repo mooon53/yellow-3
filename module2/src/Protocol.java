@@ -107,8 +107,12 @@ public class Protocol {
     public static  String sendTurn(){
         return "SENDTURN";
     }
-    public static String gameover(String reason){
-        return "GAMEOVER"+AS+reason;
+    public static String gameover(String reason, String username){
+        if (reason.equals("DRAW")) {
+            return "GAMEOVER" + AS + "DRAW";
+        } else {
+            return "GAMEOVER" + AS + reason + AS + username;
+        }
     }
     public static String list(ArrayList<String> names){
         String res = "LIST";

@@ -94,7 +94,7 @@ public class GameServer extends Thread implements Server {
 
     public String removeClient(ClientHandler clientHandler) {
         this.clientHandlers.remove(clientHandler);
-        return Protocol.gameover("DISCONNECT");
+        return Protocol.gameover("DISCONNECT", clientHandlers.get(0).getUsername());
     }
 
     @Override
@@ -115,6 +115,7 @@ public class GameServer extends Thread implements Server {
     public synchronized String loginClient(String username) {
         String command = null;
         if (availableUsername(username)) {
+            clientHandlers.get(clientHandlers.size() - 1).setUsername(username);
             loggedPlayers.add(username);
             this.username = username;
             command = Protocol.login();
@@ -150,7 +151,6 @@ public class GameServer extends Thread implements Server {
         String command = null;
         if (queue.size() == 2) {
             game = new Game(playerSet.get(0), playerSet.get(1));
-            game.getBoard();
             games.add(game);
             viewer.displayServerStatus();
             command = Protocol.newGame(playerSet.get(0).getName(), playerSet.get(1).getName());
@@ -163,7 +163,12 @@ public class GameServer extends Thread implements Server {
         return command;
     }
 
-    public String makeMove(int index, int rotation) {
+    public String makeMove(int index, int rotation, String user) {
+        for (Player player : players.keySet()) {
+            if (player.getName().equals(user)) {
+                currentPlayer = player;
+            }
+        }
         this.game.getBoard().setField(index, players.get(currentPlayer));
         int choice = encodeRotation(rotation)[0];
         int side = encodeRotation(rotation)[1];
@@ -173,7 +178,37 @@ public class GameServer extends Thread implements Server {
             this.game.getBoard().rotateLeft(choice);
         }
         System.out.println(this.game.getBoard().toString());
-        return Protocol.move(index, rotation);
+        String command = Protocol.move(index, rotation);
+        //the move is done, now we check if the game has ended
+        if (game.getBoard().isFull() || game.getBoard().isWinner(Mark.XX) || game.getBoard().isWinner(Mark.OO)){
+            String gameOver;
+            String winner = null;
+            if (game.getBoard().isWinner(Mark.XX)) {
+                for (Player player : players.keySet()) {
+                    if (players.get(player) == Mark.XX) {
+                        winner = player.getName();
+                    }
+                }
+                gameOver = Protocol.gameover("VICTORY", winner);
+            } else if (game.getBoard().isWinner(Mark.OO)) {
+                for (Player player : players.keySet()) {
+                    if (players.get(player) == Mark.OO) {
+                        winner = player.getName();
+                    }
+                }
+                gameOver = Protocol.gameover("VICTORY", winner);
+            } else {
+                gameOver = Protocol.gameover("DRAW", winner);
+            }
+            for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
+                clientHandler.sendMessage(gameOver);
+            }
+            games.remove(game); //not sure if needed
+        }
+        for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
+            clientHandler.sendMessage(command);
+        }
+        return command;
     }
 
     public int[] encodeRotation(int index) {
@@ -247,7 +282,6 @@ public class GameServer extends Thread implements Server {
 
     public synchronized String greeting(String username) {
         this.username = username.replace("Client by ", "");
-        clientHandlers.get(clientHandlers.size() - 1).setUsername(this.username);
         String command = Protocol.greeting(username.replace("Client by ", "Server by "));//Server by Name
         return command;
     }

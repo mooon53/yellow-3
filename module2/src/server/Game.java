@@ -116,11 +116,11 @@ public class Game {
         if (board.isFull() || win()) {
             if (board.isFull()) {
                 reason = "DRAW";
-                command = Protocol.gameover(reason);
+                command = Protocol.gameover(reason, players.get(indexOfCurrentPlayer).getName());
                 //sendMessage(command);
             } else if (win()) {
                 reason = "VICTORY";
-                command = Protocol.gameover(reason);
+                command = Protocol.gameover(reason, players.get(indexOfCurrentPlayer).getName());
                 //sendMessage(command);
             }
             return true;

@@ -101,9 +101,8 @@ public class Logic extends Thread {
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
                         int rotation = Integer.parseInt(decode.get(2));
-                        com = this.getClientHandler().getServer().makeMove(move, rotation);
+                        com = this.getClientHandler().getServer().makeMove(move, rotation, clientHandler.getUsername());
                         System.out.println(com);
-                        this.getClientHandler().sendMessage(com);
                         break;
                     case SENDTURN:
                         String nameToTurn = decode.get(1);
