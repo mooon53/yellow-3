@@ -106,9 +106,10 @@ public class Logic extends Thread {
                         break;
                     case SENDTURN:
                         String nameToTurn = decode.get(1);
-                        com = this.getClientHandler().getServer().sendTurn(nameToTurn);
-                        System.out.println(com);
-                        this.getClientHandler().sendMessage(com);
+                        this.getClientHandler().getServer().sendTurn(nameToTurn);
+                        break;
+                    case SENDBOARD:
+                        this.getClientHandler().getServer().sendBoard();
                         break;
                     case QUIT:
                         com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
@@ -173,8 +174,13 @@ public class Logic extends Thread {
                     case SENDTURN:
                         this.getPlayer().move();
                         break;
-                    case MOVE:
+                    case SENDBOARD:
+                        String board = decode.get(1).replace('!', '\n');
+                        this.getPlayer().setBoard(board);
                         this.getPlayer().sendTurn(this.getPlayer().getUsername());
+                        break;
+                    case MOVE:
+                        this.getPlayer().sendBoard();
                         break;
                     case GAMEOVER:
                         String reason = decode.get(1);

@@ -48,7 +48,7 @@ public class HumanPlayer extends Player {
             direction = scanner.nextInt();
             free = direction == 0 || direction == 1;
         }
-        result[1] = rotation+(direction*4);
+        result[1] = (rotation*2) +direction;
         return result;
     }
 

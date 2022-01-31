@@ -60,6 +60,10 @@ public class ClientViewer extends Thread{
         System.out.println("Your opponent: "+getClient().getOpponentUsername());
     }
 
+    public void displayCurrentBoard(){
+        System.out.println("Updated board:\n"+getClient().getCurrentBoard());
+    }
+
     public void announce(String msg){
         System.out.println(msg);
     }

@@ -28,7 +28,7 @@ public class GameServer extends Thread implements Server {
     private ArrayList<String> loggedPlayers = new ArrayList<>();
     private Map<Player, Mark> players = new HashMap<Player, Mark>();
     private ArrayList<Player> playerSet = new ArrayList<>();
-    private int turn = 0;
+    private int turn;
 
 
     public GameServer(int port) {
@@ -62,6 +62,16 @@ public class GameServer extends Thread implements Server {
     //@pure;
     public ServerViewer getViewer() {
         return viewer;
+    }
+
+    public ClientHandler getClientHandlerByName(String name) {
+        ClientHandler result = null;
+        for (ClientHandler clientHandler : getClientHandlers()) {
+            if (clientHandler.getUsername().equals(name)) {
+                result = clientHandler;
+            }
+        }
+        return result;
     }
 
     public Socket getSocket() {
@@ -153,11 +163,12 @@ public class GameServer extends Thread implements Server {
             game = new Game(playerSet.get(0), playerSet.get(1));
             games.add(game);
             viewer.displayServerStatus();
-            command = Protocol.newGame(playerSet.get(0).getName(), playerSet.get(1).getName());
+            command = Protocol.newGame(playerSet.get(1).getName(), playerSet.get(0).getName());
             for (ClientHandler clientHandler : queue) {
                 clientHandler.sendMessage(command);
             }
             this.queue.clear();
+            this.turn = 0;
             return command;
         }
         return command;
@@ -180,7 +191,7 @@ public class GameServer extends Thread implements Server {
         System.out.println(this.game.getBoard().toString());
         String command = Protocol.move(index, rotation);
         //the move is done, now we check if the game has ended
-        if (game.getBoard().isFull() || game.getBoard().isWinner(Mark.XX) || game.getBoard().isWinner(Mark.OO)){
+        if (game.getBoard().isFull() || game.getBoard().isWinner(Mark.XX) || game.getBoard().isWinner(Mark.OO)) {
             String gameOver;
             String winner = null;
             if (game.getBoard().isWinner(Mark.XX)) {
@@ -250,9 +261,31 @@ public class GameServer extends Thread implements Server {
         return result;
     }
 
-    public synchronized String sendTurn(String username) {
+    public synchronized void sendTurn(String username) {
         String com = null;
-        for (Player player : this.playerSet) {
+        if (playerSet.get(this.turn).getName().equals(username)) {
+            com = Protocol.sendTurn();
+            System.out.println(com);
+            getClientHandlerByName(username).sendMessage(com);
+            if (this.turn == 0) {
+                this.turn = 1;
+            } else {
+                this.turn = 0;
+                try {
+                    wait();
+                } catch (InterruptedException e) {
+                   System.out.println(Protocol.error("waiting interrupted"));
+                }
+            }
+        } else {
+            try {
+                wait();
+            } catch (InterruptedException e) {
+                System.out.println(Protocol.error("waiting interrupted"));
+            }
+        }
+
+        /*for (Player player : this.playerSet) {
             if (player.getName().equals(username) && players.get(player).equals(Mark.XX)) {
                 com = Protocol.sendTurn();
                 this.currentPlayer = player;
@@ -262,23 +295,32 @@ public class GameServer extends Thread implements Server {
                 this.turn = 0;
             }
         }
-        return com;
+        return com;*/
     }
 
-  /*  public synchronized String move(int move, int rotation) {
-        String command = null;
-        int yourTurn = 0;
-        for (ClientHandler clientHandler : clientHandlers) {
-            clientHandler.makeMove(move, rotation);
-            command = Protocol.move(move, rotation);
-            if (yourTurn == 0) {
-                yourTurn = 1;
-            } else {
-                yourTurn = 0;
-            }
+    /*  public synchronized String move(int move, int rotation) {
+          String command = null;
+          int yourTurn = 0;
+          for (ClientHandler clientHandler : clientHandlers) {
+              clientHandler.makeMove(move, rotation);
+              command = Protocol.move(move, rotation);
+              if (yourTurn == 0) {
+                  yourTurn = 1;
+              } else {
+                  yourTurn = 0;
+              }
+          }
+          return command;
+      }*/
+    public synchronized void sendBoard() {
+        String com = null;
+        for (ClientHandler ch : clientHandlers){
+            String board = this.game.getBoard().toString().replace('\n', '!');
+            com = Protocol.sendBoard(board);
+            ch.sendMessage(com);
+            notifyAll();
         }
-        return command;
-    }*/
+    }
 
     public synchronized String greeting(String username) {
         this.username = username.replace("Client by ", "");

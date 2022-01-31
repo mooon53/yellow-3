@@ -14,13 +14,15 @@ import java.io.PrintStream;
 import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Scanner;
+import java.util.concurrent.locks.Lock;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GameClient extends Thread {
     private Socket socket;
     private PrintStream writer;
     private ArrayList<Player> players;
     private int level;
-
+    private String currentBoard;
     private ComputerPlayer cp = null;
     private String username;
     private String opponentUsername;
@@ -29,6 +31,7 @@ public class GameClient extends Thread {
     private Thread logic;
     private ClientViewer viewer;
     private Game game;
+    private Lock lock = new ReentrantLock();
 
     Scanner scanner = new Scanner(System.in);
 
@@ -73,6 +76,9 @@ public class GameClient extends Thread {
         return opponentUsername;
     }
 
+    public String getCurrentBoard() {
+        return currentBoard;
+    }
 
     //set player - mark - ID connection
     public void setSides() {
@@ -90,6 +96,11 @@ public class GameClient extends Thread {
     public void setOpponentUsername(String opponentUsername) {
         this.opponentUsername = opponentUsername;
         this.getViewer().displayOpponentUsername();
+    }
+
+    public void setBoard(String board){
+        this.currentBoard = board;
+        this.getViewer().displayCurrentBoard();
     }
 
 
@@ -132,7 +143,7 @@ public class GameClient extends Thread {
         }
     }
 
-    public synchronized void setupGame() {
+    public synchronized void setupGame() {//remove creation of boards for clients and assigning mark
         Player player1 = null;
         switch(this.level){
             case 1:
@@ -163,7 +174,6 @@ public class GameClient extends Thread {
         String com = Protocol.sendTurn(username);
         writer.println(com);
         writer.flush();
-
     }
 
 
@@ -172,8 +182,10 @@ public class GameClient extends Thread {
         if (!game.gameOver()) {
             int[] move = game.getPlayer().turn(game.getBoard());
             com = Protocol.move(move[0], move[1]);
+            notify();
             writer.println(com);
             writer.flush();
+            /*
             game.getBoard().setField(move[0], game.getPlayer().getMark());
             int subBoard = encodeRotation(move[1])[0];
             int rotation = encodeRotation(move[1])[1];
@@ -186,13 +198,19 @@ public class GameClient extends Thread {
             game.update();
             game.next();
             game.gameOver();
-
+*/
         } else {
             com = Protocol.quit();
             writer.println(com);
             writer.flush();
         }
     }
+
+    public synchronized void sendBoard(){
+        writer.println(Protocol.sendBoard());
+        writer.flush();
+    }
+
     public int[] encodeRotation(int index) {
         int[] result = new int[2];
         switch (index) {
