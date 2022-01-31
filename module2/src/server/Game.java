@@ -164,9 +164,6 @@ public class Game {
         com = Protocol.quit();
 
     }
-    public String printBoard(){
-       return this.getBoard().toString();
-    }
 
 
 }

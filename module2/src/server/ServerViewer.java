@@ -1,5 +1,9 @@
 package src.server;
 
+import src.Protocol;
+
+import java.net.InetAddress;
+import java.net.UnknownHostException;
 import java.util.Scanner;
 
 public class ServerViewer extends Thread{
@@ -13,6 +17,19 @@ public class ServerViewer extends Thread{
 
     public GameServer getServer() {
         return server;
+    }
+
+    public InetAddress getInetAddress(){
+        InetAddress inetAddress=null;
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("Choose inetaddress: ");
+        String string = scanner.next();
+        try {
+            inetAddress= InetAddress.getByName(string);
+        } catch (UnknownHostException e) {
+            System.out.println(Protocol.error("unknown host"));
+        }
+        return inetAddress;
     }
 
     public int getPort(){
