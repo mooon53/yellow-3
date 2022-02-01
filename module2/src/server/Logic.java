@@ -1,6 +1,12 @@
 package src.server;
 
 import src.Protocol;
+import src.ai.BasicStrategy;
+import src.ai.ComputerPlayer;
+import src.ai.DumbStrategy;
+import src.ai.Strategy;
+import src.game.HumanPlayer;
+import src.game.Mark;
 
 import java.io.*;
 import java.sql.SQLOutput;
@@ -56,7 +62,7 @@ public class Logic extends Thread {
     }
 
 
-    public void receiveMessageFromClient() throws IOException{
+    public void receiveMessageFromClient() throws IOException {
         while (true) {
             String protocolMessage = null;
             try {
@@ -101,15 +107,7 @@ public class Logic extends Thread {
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
                         int rotation = Integer.parseInt(decode.get(2));
-                        com = this.getClientHandler().getServer().makeMove(move, rotation, clientHandler.getUsername());
-                        System.out.println(com);
-                        break;
-                    case SENDTURN:
-                        String nameToTurn = decode.get(1);
-                        this.getClientHandler().getServer().sendTurn(nameToTurn);
-                        break;
-                    case SENDBOARD:
-                        this.getClientHandler().getServer().sendBoard();
+                        this.getClientHandler().getServer().makeMove(move, rotation, clientHandler.getUsername());
                         break;
                     case QUIT:
                         com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
@@ -124,7 +122,6 @@ public class Logic extends Thread {
                         this.getClientHandler().getServer().ping();
                         break;
                     default:
-                        System.out.println(protocolMessage);
                         break;
                 }
             }
@@ -165,23 +162,33 @@ public class Logic extends Thread {
                     case LIST:
                         this.getPlayer().joinQueue();
                         break;
-                    case NEWGAME:
-                        if(decode.get(1).equals(this.getPlayer().getUsername())){
-                            this.getPlayer().setupGame(0);
-                        } else if (decode.get(2).equals(this.getPlayer().getUsername())){
-                            this.getPlayer().setupGame(1);
+                    case NEWGAME://change to add CP
+                        int level = getPlayer().getLevel();
+                        switch (level) {
+                            case 0:
+                                this.getPlayer().createGame(new HumanPlayer(decode.get(1), Mark.XX), new HumanPlayer(decode.get(2), Mark.OO));
+                                break;
+                            case 1:
+                                Strategy strategy = new DumbStrategy();
+                                this.getPlayer().createGame(new HumanPlayer(decode.get(1), Mark.XX), new ComputerPlayer(strategy, Mark.OO));
+                                break;
+                            case 2:
+                                Strategy strategy1 = new BasicStrategy();
+                                this.getPlayer().createGame(new HumanPlayer(decode.get(1), Mark.XX), new ComputerPlayer(strategy1, Mark.OO));
+                                break;
                         }
                         break;
-                    case SENDTURN:
-                        //this.getPlayer().move();
-                        break;
-                    case SENDBOARD:
-                        String board = decode.get(1).replace('!', '\n');
-                        this.getPlayer().setBoard(board);
-                        this.getPlayer().sendTurn(this.getPlayer().getUsername());
-                        break;
                     case MOVE:
-                        this.getPlayer().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
+                        int move[];
+                        this.getPlayer().updateBoard(Integer.parseInt(decode.get(1)), Integer.parseInt(decode.get(2)));
+                        if (getPlayer().getCurrentPlayer() == 0) {
+                            move = getPlayer().getPlayers().get(0).turn(getPlayer().getGame().getBoard());
+                        } else {
+                            move = getPlayer().getPlayers().get(1).turn(getPlayer().getGame().getBoard());
+                        }
+                        getPlayer().getWriter().println(Protocol.move(move[0], move[1]));
+                        getPlayer().getWriter().flush();
+                        getPlayer().getGame().next();
                         break;
                     case GAMEOVER:
                         String reason = decode.get(1);
@@ -197,7 +204,6 @@ public class Logic extends Thread {
                         this.getPlayer().ping();
                         break;
                     default:
-                        System.out.println(protocolMessage);
                         break;
 
                 }
