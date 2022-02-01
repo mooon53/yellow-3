@@ -26,6 +26,7 @@ public class GameServer extends Thread implements Server {
     private Player currentPlayer;
     private ArrayList<ClientHandler> queue;
     private ArrayList<String> loggedPlayers = new ArrayList<>();
+    private Map<Player, Mark> players = new HashMap<Player, Mark>();
     private ArrayList<Player> playerSet = new ArrayList<>();
     private int turn;
 
@@ -148,16 +149,11 @@ public class GameServer extends Thread implements Server {
         int id = 0;
         if (state == 0) {
             this.queue.add(clientHandler);
-            state++;
         } else if (state == 1) {
             queue.add(clientHandler);
-
-            playerSet.add(new HumanPlayer(this.queue.get(0).getUsername(),Mark.XX));
+            playerSet.add(new HumanPlayer(this.queue.get(0).getUsername(), Mark.XX));
+            playerSet.add(new HumanPlayer(this.queue.get(1).getUsername(), Mark.OO));
             sendList();
-            state++;
-            playerSet.add(new HumanPlayer(this.queue.get(1).getUsername(),Mark.OO));
-            sendList();
-            state++;
         }
     }
 
@@ -192,31 +188,22 @@ public class GameServer extends Thread implements Server {
         } else if (side == 1) {
             this.game.getBoard().rotateLeft(choice);
         }
+        //System.out.println(this.game.getBoard().toString());
         String command = Protocol.move(index, rotation);
-        for (ClientHandler clientHandler : clientHandlers){
-            if(clientHandler.getUsername().equals(playerSet.get(0).getName()) || clientHandler.getUsername().equals(playerSet.get(1).getName())){
-                clientHandler.sendMessage(command);
-            }
-        }
-        System.out.println(command);
-
-
-        /*System.out.println(this.game.getBoard().toString());
-
         //the move is done, now we check if the game has ended
         if (game.getBoard().isFull() || game.getBoard().isWinner(Mark.XX) || game.getBoard().isWinner(Mark.OO)) {
             String gameOver;
             String winner = null;
             if (game.getBoard().isWinner(Mark.XX)) {
-                for (Player player : players.keySet()) {
-                    if (players.get(player) == Mark.XX) {
+                for (Player player : playerSet) {
+                    if (player.getMark() == Mark.XX) {
                         winner = player.getName();
                     }
                 }
                 gameOver = Protocol.gameover("VICTORY", winner);
             } else if (game.getBoard().isWinner(Mark.OO)) {
-                for (Player player : players.keySet()) {
-                    if (players.get(player) == Mark.OO) {
+                for (Player player : playerSet) {
+                    if (player.getMark() == Mark.OO) {
                         winner = player.getName();
                     }
                 }
@@ -224,15 +211,18 @@ public class GameServer extends Thread implements Server {
             } else {
                 gameOver = Protocol.gameover("DRAW", winner);
             }
-            for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
-                clientHandler.sendMessage(gameOver);
+            for (ClientHandler clientHandler : clientHandlers) {
+                if(clientHandler.getUsername().equals(playerSet.get(0).getName()) || clientHandler.getUsername().equals(playerSet.get(1).getName())){
+                    clientHandler.sendMessage(gameOver);
+                }
             }
             games.remove(game);
         }
         for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
-            clientHandler.sendMessage(command);
+            if(clientHandler.getUsername().equals(playerSet.get(0).getName()) || clientHandler.getUsername().equals(playerSet.get(1).getName())){
+                clientHandler.sendMessage(command);
+            }
         }
-        return command;*/
     }
 
     public int[] encodeRotation(int index) {
@@ -273,34 +263,6 @@ public class GameServer extends Thread implements Server {
         }
         return result;
     }
-
-
-        /*for (Player player : this.playerSet) {
-            if (player.getName().equals(username) && players.get(player).equals(Mark.XX)) {
-                com = Protocol.sendTurn();
-                this.currentPlayer = player;
-            } else if (player.getName().equals(username)&& players.get(player).equals(Mark.OO)) {
-                com = Protocol.sendTurn();
-                this.currentPlayer = player;
-                this.turn = 0;
-            }
-        }
-        return com;*/
-
-    /*  public synchronized String move(int move, int rotation) {
-          String command = null;
-          int yourTurn = 0;
-          for (ClientHandler clientHandler : clientHandlers) {
-              clientHandler.makeMove(move, rotation);
-              command = Protocol.move(move, rotation);
-              if (yourTurn == 0) {
-                  yourTurn = 1;
-              } else {
-                  yourTurn = 0;
-              }
-          }
-          return command;
-      }*/
 
     public synchronized String greeting(String username) {
         this.username = username.replace("Client by ", "");

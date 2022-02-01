@@ -6,7 +6,6 @@ import src.game.GameBoard;
 import src.game.HumanPlayer;
 import src.game.Mark;
 import src.game.Player;
-
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
@@ -24,8 +23,6 @@ public class GameClient extends Thread {
     private String currentBoard;
     private Player player = null;
     private String username;
-    private  int player1ID;
-    private  int player2ID;
     private String opponentUsername;
     private GameBoard board;
     private Thread logic;
@@ -70,26 +67,9 @@ public class GameClient extends Thread {
         return currentPlayer;
     }
 
-    public Game getGame() {
-        return game;
-    }
-
-    public void setCurrentPlayer(int id){
-        this.currentPlayer = id;
-    }
-
-
     //@pure;
     public String getUsername() {
         return username;
-    }
-
-    public PrintStream getWriter() {
-        return writer;
-    }
-
-    public int getLevel() {
-        return level;
     }
 
     //@pure;
@@ -119,10 +99,12 @@ public class GameClient extends Thread {
         this.getViewer().displayOpponentUsername();
     }
 
-    public void setBoard(String board) {
+    public void setBoard(String board){
         this.currentBoard = board;
         this.getViewer().displayCurrentBoard();
     }
+
+
 
 
     public synchronized void setupLogic() {
@@ -141,121 +123,60 @@ public class GameClient extends Thread {
     }
 
 
-    /*public synchronized void setupGame(int currentPlayer) {//remove creation of boards for clients and assigning mark
-        switch (this.level) {
+
+    public synchronized void setupGame(int currentPlayer) {//remove creation of boards for clients and assigning mark
+        switch(this.level){
             case 1:
                 Strategy strategy = new BasicStrategy();
-                player = new ComputerPlayer(strategy);
+                player = new ComputerPlayer(strategy, Mark.OO);
                 break;
             case 2:
                 Strategy strategy1 = new SmartStrategy();
-                player = new ComputerPlayer(strategy1);
+                player = new ComputerPlayer(strategy1, Mark.OO);
                 break;
             default:
-                player = new HumanPlayer(getUsername());
+                player = new HumanPlayer(getUsername(), Mark.OO);
                 break;
         }
         player.assignMark(0);
         this.currentPlayer = currentPlayer;
         if (currentPlayer == 0) {
-            //sendMove();
+            sendMove();
         }
-Mark mark1 = player1.getMark();
-        this.players.add(player1);
-        Player player2 = new HumanPlayer(getOpponentUsername());
-        this.players.add(player2);
-        player2.assignMark(1);
-        Mark mark2 = player2.getMark();
-        this.game = new Game(player1, player2);
-        sendTurn(player1.getName());
-        System.out.println(game.getBoard().toString());*/
-
-
-    public synchronized void createGame(Player player1, Player player2) {
-        player1.setPlayerID(0);
-        player1ID = player1.getPlayerID();
-        player = player1;
-        player2.setPlayerID(1);
-        player2ID = player2.getPlayerID();
-        players.add(player1);
-        players.add(player2);
-        this.game = new Game(player1, player2);
-        System.out.println(game.getBoard().toString());
-        this.currentPlayer = 0;
-        System.out.println(getPlayers().get(currentPlayer).getName());
-        sendMove(player);
     }
 
 
-    public void sendMove(Player player) {
+    public void sendMove() {
+        currentPlayer = 0;
         int[] move = player.turn(board);
         String command = Protocol.move(move[0], move[1]);
         writer.println(command);
         writer.flush();
-        //System.out.println(board.toString());
+        System.out.println(board.toString());
+    }
 
-        /*int[] position = null;
-        if (currentPlayer == clientID) {
-            position = this.players.get(currentPlayer).turn(this.board);
-            String command = Protocol.move(position[0], position[1]);
-            writer.println(command);
-            writer.flush();
-        }
-        if (position != null && cp != null) {
-            try {
-                Thread.sleep(200);
-            } catch (InterruptedException e) {
-                System.out.println(Protocol.error());
+
+    public synchronized void move(int move, int rotation) {
+        if (currentPlayer == 0) {
+            board.setField(move, player.getMark());
+            if (rotation % 2 == 1) { //rotate to the left if rotation is uneven
+                board.rotateLeft(rotation / 2);
+            } else { //else, rotate to the right
+                board.rotateRight(rotation / 2);
             }
-        }*/
-    }
-
-
-    public synchronized void updateBoard(int move, int rotation) {
-        this.game.getBoard().setField(move, players.get(this.currentPlayer).getMark());
-        if (rotation % 2 == 1) { //rotate to the left if rotation is uneven
-            board.rotateLeft(rotation / 2);
-        } else { //else, rotate to the right
-            board.rotateRight(rotation / 2);
-        }
-        if (this.currentPlayer == 0) {
-            this.currentPlayer = 1;
+            currentPlayer++;
         } else {
-            this.currentPlayer = 0;
-        }
-        System.out.println(this.game.getBoard().toString());
-        /*String com = null;
-        if (!game.gameOver()) {
-            int[] move = game.getPlayer().turn(game.getBoard());
-            com = Protocol.move(move[0], move[1]);
-            notify();
-            /*
-            game.getBoard().setField(move[0], game.getPlayer().getMark());
-            int subBoard = encodeRotation(move[1])[0];
-            int rotation = encodeRotation(move[1])[1];
-            if(rotation==0){
-                game.getBoard().rotateRight(subBoard);
-            } else{
-                game.getBoard().rotateLeft(subBoard);
+            board.setField(move, player.getMark().other());
+            if (rotation % 2 == 1) { //rotate to the left if rotation is uneven
+                board.rotateLeft(rotation / 2);
+            } else { //else, rotate to the right
+                board.rotateRight(rotation / 2);
             }
-            System.out.println(game.getBoard().toString());
-            game.update();
-            game.next();
-            game.gameOver();
-        } else {
-            com = Protocol.quit();
+            System.out.println(board.toString());
+            sendMove();
         }
-        writer.println(com);
-        writer.flush();*/
     }
 
-    public synchronized void move() {
-            int move[] = players.get(currentPlayer).turn(this.game.getBoard());
-            String command = Protocol.move(move[0], move[1]);
-            writer.println(command);
-            writer.flush();
-            game.next();
-    }
 
     public int[] encodeRotation(int index) {
         int[] result = new int[2];
@@ -298,7 +219,7 @@ Mark mark1 = player1.getMark();
 
     //logic queries
     public synchronized void greeting(String name) {
-        String command = Protocol.greeting("Client by " + name);
+        String command = Protocol.greeting("Client by "+name);
         writer.println(command);
         writer.flush();
     }

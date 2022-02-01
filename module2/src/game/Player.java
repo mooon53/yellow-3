@@ -2,9 +2,8 @@ package src.game;
 
 public abstract class Player {
     private String name;
-    private int playerID;
-    private Mark mark;
     private boolean yourTurn;
+    private Mark mark;
 
     public Player(String name, Mark mark){
         this.name = name;
@@ -17,23 +16,32 @@ public abstract class Player {
 
     public abstract int[] turn(GameBoard board);
 
-    public Mark getMark() {
-        return this.mark;
+    public void assignMark(int index) {
+        if (index == 1) {
+            this.mark= Mark.XX;
+        } else {
+            this.mark= Mark.OO;
+        }
     }
-
-    public boolean getYourTurn(){
+    public boolean getTurn(){
         return yourTurn;
     }
-
-    public void setYourTurn(boolean yourTurn){
-        this.yourTurn = yourTurn;
+    public boolean getTurnByName(String name){
+        boolean res = false;
+        if(this.getName().equals(name)){
+            res = this.getTurn();
+        }
+        return res;
+    }
+    public void setTurn(){
+        if(yourTurn){
+            this.yourTurn = false;
+        } else{
+            this.yourTurn = true;
+        }
     }
 
-    public int getPlayerID() {
-        return playerID;
-    }
-
-    public void setPlayerID(int playerID) {
-        this.playerID = playerID;
+    public Mark getMark() {
+        return this.mark;
     }
 }

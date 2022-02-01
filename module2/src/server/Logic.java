@@ -1,12 +1,6 @@
 package src.server;
 
 import src.Protocol;
-import src.ai.BasicStrategy;
-import src.ai.ComputerPlayer;
-import src.ai.DumbStrategy;
-import src.ai.Strategy;
-import src.game.HumanPlayer;
-import src.game.Mark;
 
 import java.io.*;
 import java.sql.SQLOutput;
@@ -62,7 +56,7 @@ public class Logic extends Thread {
     }
 
 
-    public void receiveMessageFromClient() throws IOException {
+    public void receiveMessageFromClient() throws IOException{
         while (true) {
             String protocolMessage = null;
             try {
@@ -162,33 +156,15 @@ public class Logic extends Thread {
                     case LIST:
                         this.getPlayer().joinQueue();
                         break;
-                    case NEWGAME://change to add CP
-                        int level = getPlayer().getLevel();
-                        switch (level) {
-                            case 0:
-                                this.getPlayer().createGame(new HumanPlayer(decode.get(1), Mark.XX), new HumanPlayer(decode.get(2), Mark.OO));
-                                break;
-                            case 1:
-                                Strategy strategy = new DumbStrategy();
-                                this.getPlayer().createGame(new HumanPlayer(decode.get(1), Mark.XX), new ComputerPlayer(strategy, Mark.OO));
-                                break;
-                            case 2:
-                                Strategy strategy1 = new BasicStrategy();
-                                this.getPlayer().createGame(new HumanPlayer(decode.get(1), Mark.XX), new ComputerPlayer(strategy1, Mark.OO));
-                                break;
+                    case NEWGAME:
+                        if(decode.get(1).equals(this.getPlayer().getUsername())){
+                            this.getPlayer().setupGame(0);
+                        } else if (decode.get(2).equals(this.getPlayer().getUsername())){
+                            this.getPlayer().setupGame(1);
                         }
                         break;
                     case MOVE:
-                        int move[];
-                        this.getPlayer().updateBoard(Integer.parseInt(decode.get(1)), Integer.parseInt(decode.get(2)));
-                        if (getPlayer().getCurrentPlayer() == 0) {
-                            move = getPlayer().getPlayers().get(0).turn(getPlayer().getGame().getBoard());
-                        } else {
-                            move = getPlayer().getPlayers().get(1).turn(getPlayer().getGame().getBoard());
-                        }
-                        getPlayer().getWriter().println(Protocol.move(move[0], move[1]));
-                        getPlayer().getWriter().flush();
-                        getPlayer().getGame().next();
+                        this.getPlayer().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
                         break;
                     case GAMEOVER:
                         String reason = decode.get(1);
