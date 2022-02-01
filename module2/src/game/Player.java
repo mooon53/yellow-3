@@ -5,8 +5,9 @@ public abstract class Player {
     private boolean yourTurn;
     private Mark mark;
 
-    public Player(String name){
+    public Player(String name, Mark mark){
         this.name = name;
+        this.mark = mark;
     }
 
     public String getName() {

@@ -101,15 +101,7 @@ public class Logic extends Thread {
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
                         int rotation = Integer.parseInt(decode.get(2));
-                        com = this.getClientHandler().getServer().makeMove(move, rotation, clientHandler.getUsername());
-                        System.out.println(com);
-                        break;
-                    case SENDTURN:
-                        String nameToTurn = decode.get(1);
-                        this.getClientHandler().getServer().sendTurn(nameToTurn);
-                        break;
-                    case SENDBOARD:
-                        this.getClientHandler().getServer().sendBoard();
+                        this.getClientHandler().getServer().makeMove(move, rotation, clientHandler.getUsername());
                         break;
                     case QUIT:
                         com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
@@ -124,7 +116,6 @@ public class Logic extends Thread {
                         this.getClientHandler().getServer().ping();
                         break;
                     default:
-                        System.out.println(protocolMessage);
                         break;
                 }
             }
@@ -172,14 +163,6 @@ public class Logic extends Thread {
                             this.getPlayer().setupGame(1);
                         }
                         break;
-                    case SENDTURN:
-                        //this.getPlayer().move();
-                        break;
-                    case SENDBOARD:
-                        String board = decode.get(1).replace('!', '\n');
-                        this.getPlayer().setBoard(board);
-                        this.getPlayer().sendTurn(this.getPlayer().getUsername());
-                        break;
                     case MOVE:
                         this.getPlayer().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
                         break;
@@ -197,7 +180,6 @@ public class Logic extends Thread {
                         this.getPlayer().ping();
                         break;
                     default:
-                        System.out.println(protocolMessage);
                         break;
 
                 }

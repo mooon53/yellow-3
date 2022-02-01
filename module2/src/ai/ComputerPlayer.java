@@ -7,8 +7,8 @@ import src.game.Player;
 public class ComputerPlayer extends Player {
     private Strategy strategy;
 
-    public ComputerPlayer(Strategy strategy) {
-        super(strategy.getName());
+    public ComputerPlayer(Strategy strategy, Mark mark) {
+        super(strategy.getName(), mark);
         this.strategy = strategy;
     }
 
