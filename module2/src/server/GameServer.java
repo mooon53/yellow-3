@@ -163,7 +163,7 @@ public class GameServer extends Thread implements Server {
             game = new Game(playerSet.get(0), playerSet.get(1));
             games.add(game);
             viewer.displayServerStatus();
-            command = Protocol.newGame(playerSet.get(1).getName(), playerSet.get(0).getName());
+            command = Protocol.newGame(queue.get(1).getUsername(), queue.get(0).getUsername());
             for (ClientHandler clientHandler : queue) {
                 clientHandler.sendMessage(command);
             }
