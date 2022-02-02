@@ -9,7 +9,7 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
-public class GameServer extends Thread implements Server {
+public class GameServer extends Thread {
     private ArrayList<ClientHandler> clientHandlers;
     private ServerSocket serverSocket;
     private ServerViewer viewer;
@@ -48,11 +48,6 @@ public class GameServer extends Thread implements Server {
         return viewer;
     }
 
-    @Override
-    public synchronized void connect() {
-
-
-    }
 
     public void addClientHandler(ClientHandler clientHandler) {
         clientHandlers.add(clientHandler);
@@ -77,10 +72,6 @@ public class GameServer extends Thread implements Server {
         }
     }
 
-    @Override
-    public int getPort() {
-        return serverSocket.getLocalPort();
-    }
 
 
     private void setViewer() {
