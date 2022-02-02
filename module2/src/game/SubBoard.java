@@ -2,8 +2,8 @@ package src.game;
 
 public class SubBoard extends AbstractBoard {
 
-    public SubBoard(int DIM) {
-        super(DIM);
+    public SubBoard(int dim) {
+        super(dim);
     }
 
 
@@ -21,11 +21,11 @@ public class SubBoard extends AbstractBoard {
      * Rotates the subBoard to the right for 90 degrees.
      */
     //@ensures \old(fields[0]).equals(fields[2]);
-    public void rotateRight(){
+    public void rotateRight() {
         Board copy = deepCopy();
-        for(int i = 0; i < dim; i++)  {
-            for(int j = 0; j < dim; j++) {
-                fields[getIndex(i , j)] = copy.getField(dim-1-j, i);
+        for (int i = 0; i < dim; i++)  {
+            for (int j = 0; j < dim; j++) {
+                fields[getIndex(i, j)] = copy.getField(dim - 1 - j, i);
             }
         }
     }
@@ -34,11 +34,11 @@ public class SubBoard extends AbstractBoard {
      * Rotates the subBoard to the left for 90 degrees.
      */
     //@ensures \old(fields[0]).equals(fields[6]);
-    public void rotateLeft(){
+    public void rotateLeft() {
         Board copy = deepCopy();
-        for(int i = 0; i < dim; i++)  {
-            for(int j = 0; j < dim; j++) {
-                fields[getIndex(i , j)] = copy.getField(j, dim-1-i);
+        for (int i = 0; i < dim; i++)  {
+            for (int j = 0; j < dim; j++) {
+                fields[getIndex(i, j)] = copy.getField(j, dim - 1 - i);
             }
         }
     }

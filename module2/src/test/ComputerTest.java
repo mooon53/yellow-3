@@ -53,7 +53,7 @@ public class ComputerTest {
         while (!board.isFull() && !board.isWinner(Mark.XX) && !board.isWinner(Mark.OO)) {
             var move = strategy.determineMove(board, mark);
             board.setField(move[0], mark);
-            if (move[1] % 2 == 1) {
+            if (move[1] % 2 == 0) {
                 board.rotateLeft(move[1] / 2);
             } else {
                 board.rotateRight(move[1] / 2);
@@ -75,7 +75,7 @@ public class ComputerTest {
         board.setField(19, Mark.XX);
         var move = strategy.determineMove(board, Mark.OO);
         board.setField(move[0], Mark.OO);
-        if (move[1] % 2 == 1) {
+        if (move[1] % 2 == 0) {
             board.rotateLeft(move[1] / 2);
         } else {
             board.rotateRight(move[1] / 2);

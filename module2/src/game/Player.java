@@ -5,7 +5,7 @@ public abstract class Player {
     private boolean yourTurn;
     private Mark mark;
 
-    public Player(String name, Mark mark){
+    public Player(String name, Mark mark) {
         this.name = name;
         this.mark = mark;
     }
@@ -18,27 +18,23 @@ public abstract class Player {
 
     public void assignMark(int index) {
         if (index == 1) {
-            this.mark= Mark.XX;
+            this.mark = Mark.XX;
         } else {
-            this.mark= Mark.OO;
+            this.mark = Mark.OO;
         }
     }
-    public boolean getTurn(){
+    public boolean getTurn() {
         return yourTurn;
     }
-    public boolean getTurnByName(String name){
+    public boolean getTurnByName(String name) {
         boolean res = false;
-        if(this.getName().equals(name)){
+        if (this.getName().equals(name)) {
             res = this.getTurn();
         }
         return res;
     }
-    public void setTurn(){
-        if(yourTurn){
-            this.yourTurn = false;
-        } else{
-            this.yourTurn = true;
-        }
+    public void setTurn() {
+        this.yourTurn = !yourTurn;
     }
 
     public Mark getMark() {

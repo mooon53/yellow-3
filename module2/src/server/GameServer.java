@@ -1,48 +1,36 @@
 package src.server;
 
 import src.Protocol;
-import src.game.HumanPlayer;
+import src.game.GameBoard;
 import src.game.Mark;
-import src.game.Player;
 
 import java.io.IOException;
-import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
 
 public class GameServer extends Thread implements Server {
     private ArrayList<ClientHandler> clientHandlers;
     private ServerSocket serverSocket;
     private ServerViewer viewer;
-    private ArrayList<Game> games = new ArrayList<>();
-    private String username;
-    private Mark mark;
-    private Game game;
-    private Socket socket;
-    private Player currentPlayer;
+    private ArrayList<GameBoard> boards;
     private ArrayList<ClientHandler> queue;
-    private ArrayList<String> loggedPlayers = new ArrayList<>();
-    private Map<Player, Mark> players = new HashMap<Player, Mark>();
-    private ArrayList<Player> playerSet = new ArrayList<>();
-    private int turn;
+    private ArrayList<String> loggedPlayers;
 
 
     public GameServer(int port) {
         try {
+            boards = new ArrayList<>();
+            loggedPlayers = new ArrayList<>();
             clientHandlers = new ArrayList<>();
             queue = new ArrayList<>();
             setViewer();
             System.out.println("_____Pentago Server_____");
-            this.serverSocket = new ServerSocket(port);
-            this.getViewer().announce("Connected to port: " + serverSocket.getLocalPort());
-            this.getViewer().displayServerStatus();
+            serverSocket = new ServerSocket(port);
+            viewer.announce("Connected to port: " + serverSocket.getLocalPort());
+            viewer.displayServerStatus();
         } catch (IOException e) {
             System.out.println(Protocol.error("Unable to set connection"));
-            this.stop();
         }
 
     }
@@ -54,40 +42,10 @@ public class GameServer extends Thread implements Server {
         return this.clientHandlers;
     }
 
-    //@pure;
-    public ServerSocket getServerSocket() {
-        return serverSocket;
-    }
 
     //@pure;
     public ServerViewer getViewer() {
         return viewer;
-    }
-
-    public ClientHandler getClientHandlerByName(String name) {
-        ClientHandler result = null;
-        for (ClientHandler clientHandler : getClientHandlers()) {
-            if (clientHandler.getUsername().equals(name)) {
-                result = clientHandler;
-            }
-        }
-        return result;
-    }
-
-    public Socket getSocket() {
-        return this.socket;
-    }
-
-    public Game getGame(String username) {
-        Game giveGame = null;
-        for (Game game : this.getGames()) {
-            for (Player player : game.getPlayers()) {
-                if (username.equals(player.getName())) {
-                    return giveGame = game;
-                }
-            }
-        }
-        return giveGame;
     }
 
     @Override
@@ -97,187 +55,142 @@ public class GameServer extends Thread implements Server {
     }
 
     public void addClientHandler(ClientHandler clientHandler) {
-        this.clientHandlers.add(clientHandler);
-        getViewer().displayServerStatus();
+        clientHandlers.add(clientHandler);
+        viewer.displayServerStatus();
     }
 
 
-    public String removeClient(ClientHandler clientHandler) {
+    public void removeClient(ClientHandler clientHandler) {
         clientHandlers.remove(clientHandler);
         queue.remove(clientHandler);
-        String command = Protocol.gameover("DISCONNECT", clientHandlers.get(0).getUsername());
-        if (!games.isEmpty()) {
-            for (ClientHandler ch : clientHandlers) { //should actually be currentPlayers only
-                ch.sendMessage(command);
-                games.remove(game); //should be current game only
+        GameBoard board = clientHandler.getBoard();
+        loggedPlayers.remove(clientHandler.getUsername());
+        if (board != null) {
+            for (ClientHandler ch : clientHandlers) {
+                if (ch.getBoard() == board) {
+                    ch.sendMessage(Protocol.gameover("DISCONNECT", ch.getUsername()));
+                    ch.setMark(null);
+                    ch.setBoard(null);
+                    boards.remove(board);
+                }
             }
         }
-        return command;
     }
 
     @Override
     public int getPort() {
-        return this.serverSocket.getLocalPort();
+        return serverSocket.getLocalPort();
     }
 
 
-    public ArrayList<ClientHandler> getQueue() {
-        return queue;
-    }
-
-    public void setViewer() {
-        this.viewer = new ServerViewer(this);
-        new Thread(this.viewer).start();
+    private void setViewer() {
+        viewer = new ServerViewer(this);
+        new Thread(viewer).start();
     }
 
     public synchronized String loginClient(String username) {
-        String command = null;
+        String command;
         if (availableUsername(username)) {
             clientHandlers.get(clientHandlers.size() - 1).setUsername(username);
             loggedPlayers.add(username);
-            this.username = username;
             command = Protocol.login();
         } else {
             command = Protocol.alreadyLoggedIn();
-            loggedPlayers.remove(loggedPlayers.size() - 1);
         }
         return command;
     }
 
     public synchronized void addToQueue(ClientHandler clientHandler) {
-        int state = this.getQueue().size();
-        int id = 0;
+        int state = queue.size();
         if (state == 0) {
-            this.queue.add(clientHandler);
+            queue.add(clientHandler);
         } else if (state == 1) {
             queue.add(clientHandler);
-            playerSet.add(new HumanPlayer(this.queue.get(0).getUsername(), Mark.XX));
-            playerSet.add(new HumanPlayer(this.queue.get(1).getUsername(), Mark.OO));
             sendList();
         }
     }
 
-    public String createGame() {
-        String command = null;
+    public void createGame() {
         if (queue.size() == 2) {
-            game = new Game(playerSet.get(0), playerSet.get(1));
-            games.add(game);
+            GameBoard board = new GameBoard();
+            boards.add(board);
             viewer.displayServerStatus();
-            command = Protocol.newGame(queue.get(1).getUsername(), queue.get(0).getUsername());
+            String com = Protocol.newGame(queue.get(1).getUsername(), queue.get(0).getUsername());
+            queue.get(1).setMark(Mark.OO);
+            queue.get(0).setMark(Mark.XX);
             for (ClientHandler clientHandler : queue) {
-                clientHandler.sendMessage(command);
+                clientHandler.setBoard(board);
+                clientHandler.sendMessage(com);
             }
-            this.queue.clear();
-            this.turn = 0;
-            return command;
+            queue.clear();
         }
-        return command;
     }
 
-    public void makeMove(int index, int rotation, String user) {
-        for (Player player : playerSet) {
-            if (player.getName().equals(user)) {
-                currentPlayer = player;
+    public void makeMove(int index, int rotation, ClientHandler user) {
+        GameBoard board = user.getBoard();
+        ClientHandler opponent = null;
+        for (ClientHandler ch : clientHandlers) {
+            if (ch.getBoard() == board && ch.getMark() != user.getMark()) {
+                opponent = ch;
+                //should only be 1 option, so break if the opponent is found
+                break;
             }
         }
-        this.game.getBoard().setField(index, currentPlayer.getMark());
-        int choice = encodeRotation(rotation)[0];
-        int side = encodeRotation(rotation)[1];
-        if (side == 0) {
-            this.game.getBoard().rotateRight(choice);
-        } else if (side == 1) {
-            this.game.getBoard().rotateLeft(choice);
+        //if opponent == null, something went wrong
+        if (opponent == null) {
+            user.sendMessage(Protocol.error("Internal server error, no opponent found"));
+            user.setBoard(null);
+            user.setMark(null);
+            return;
         }
-        //System.out.println(this.game.getBoard().toString());
-        String command = Protocol.move(index, rotation);
+
+        if (board.getField(index) != Mark.EMPTY) {
+            user.sendMessage(Protocol.error("Illegal move, try again"));
+            return;
+        }
+
+
+        //now execute the move
+        board.setField(index, user.getMark());
+        if (rotation % 2 == 0) {
+            board.rotateLeft(rotation / 2);
+        } else {
+            board.rotateRight(rotation / 2);
+        }
+        user.sendMessage(Protocol.move(index, rotation));
+        opponent.sendMessage(Protocol.move(index, rotation));
+        System.out.println(board); //for testing purposes
         //the move is done, now we check if the game has ended
-        if (game.getBoard().isFull() || game.getBoard().isWinner(Mark.XX) || game.getBoard().isWinner(Mark.OO)) {
+        if (board.isFull() || board.isWinner(Mark.XX) || board.isWinner(Mark.OO)) {
             String gameOver;
-            String winner = null;
-            if (game.getBoard().isWinner(Mark.XX)) {
-                for (Player player : playerSet) {
-                    if (player.getMark() == Mark.XX) {
-                        winner = player.getName();
-                    }
-                }
-                gameOver = Protocol.gameover("VICTORY", winner);
-            } else if (game.getBoard().isWinner(Mark.OO)) {
-                for (Player player : playerSet) {
-                    if (player.getMark() == Mark.OO) {
-                        winner = player.getName();
-                    }
-                }
-                gameOver = Protocol.gameover("VICTORY", winner);
+            if (board.isWinner(user.getMark())) {
+                gameOver = Protocol.gameover("VICTORY", user.getUsername());
+            } else if (board.isWinner(opponent.getMark())) {
+                gameOver = Protocol.gameover("VICTORY", opponent.getUsername());
             } else {
-                gameOver = Protocol.gameover("DRAW", winner);
+                gameOver = Protocol.gameover("DRAW", "");
             }
-            for (ClientHandler clientHandler : clientHandlers) {
-                if(clientHandler.getUsername().equals(playerSet.get(0).getName()) || clientHandler.getUsername().equals(playerSet.get(1).getName())){
-                    clientHandler.sendMessage(gameOver);
-                }
-            }
-            games.remove(game);
-        }
-        for (ClientHandler clientHandler : clientHandlers) { //should actually be currentPlayers only
-            if(clientHandler.getUsername().equals(playerSet.get(0).getName()) || clientHandler.getUsername().equals(playerSet.get(1).getName())){
-                clientHandler.sendMessage(command);
-            }
+            //clear board and mark fields of clientHandlers
+            user.sendMessage(gameOver);
+            user.setBoard(null);
+            user.setMark(null);
+            opponent.sendMessage(gameOver);
+            opponent.setBoard(null);
+            opponent.setMark(null);
+            boards.remove(board);
         }
     }
 
-    public int[] encodeRotation(int index) {
-        int[] result = new int[2];
-        switch (index) {
-            case 0:
-                result[0] = 0;
-                result[1] = 0;
-                break;
-            case 1:
-                result[0] = 0;
-                result[1] = 1;
-                break;
-            case 2:
-                result[0] = 1;
-                result[1] = 0;
-                break;
-            case 3:
-                result[0] = 1;
-                result[1] = 1;
-                break;
-            case 4:
-                result[0] = 2;
-                result[1] = 0;
-                break;
-            case 5:
-                result[0] = 2;
-                result[1] = 1;
-                break;
-            case 6:
-                result[0] = 3;
-                result[1] = 0;
-                break;
-            case 7:
-                result[0] = 3;
-                result[1] = 1;
-                break;
-        }
-        return result;
-    }
-
-    public synchronized String greeting(String username) {
-        this.username = username.replace("Client by ", "");
-        String command = Protocol.greeting(username.replace("Client by ", "Server by "));//Server by Name
-        return command;
+    public synchronized String greeting() {
+        return Protocol.greeting("PentagoServer of Katy and Niels :)");
     }
 
 
     public boolean availableUsername(String username) {
         boolean is = true;
-        if (!this.getClientHandlers().isEmpty()) {
-            for (String player : this.loggedPlayers) {
-                if (player != null && !player.equals("") && player.equals(username)) {
-                    is = false;
-                }
+        for (String player : this.loggedPlayers) {
+            if (player != null && !player.equals("") && player.equals(username)) {
+                is = false;
             }
         }
         return is;
@@ -289,17 +202,17 @@ public class GameServer extends Thread implements Server {
         return command;
     }
 
-    public String ping() {
-        return Protocol.ping();
-    }
-
-    public void pong() {
+    public void ping() {
         System.out.println("PONG");
     }
 
+    public void pong(ClientHandler ch) {
+        ch.sendMessage(Protocol.pong());
+    }
 
-    public ArrayList<Game> getGames() {
-        return this.games;
+
+    public ArrayList<GameBoard> getBoards() {
+        return boards;
     }
 
     public void run() {
@@ -315,6 +228,4 @@ public class GameServer extends Thread implements Server {
         }
     }
 
-    public void removeGame(Game game) {
-    }
 }

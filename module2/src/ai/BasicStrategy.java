@@ -4,9 +4,13 @@ import src.game.Board;
 import src.game.GameBoard;
 import src.game.Mark;
 
+/**
+ * A strategy that selects winning moves, and prevents winning moves of the opponent.
+ * Is still easy to win against, because you often have multiple winning moves at the same time
+ * Also always returns the first legal move if opponent has no way of winning
+ */
 public class BasicStrategy implements Strategy {
-    //A strategy that selects winning moves, and prevents winning moves of the opponent
-    //Is still easy to win against, because you often have multiple winning moves at the same time
+
     private DumbStrategy random = new DumbStrategy();
 
     @Override
@@ -20,7 +24,7 @@ public class BasicStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                    if (j % 2 == 0) { //rotate to the left if j is uneven
                         copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
                         copy.rotateRight(j / 2);
@@ -49,7 +53,7 @@ public class BasicStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                    if (j % 2 == 0) { //rotate to the left if j is uneven
                         copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
                         copy.rotateRight(j / 2);
@@ -60,8 +64,8 @@ public class BasicStrategy implements Strategy {
                 }
             }
         }
-        //if there isn't a way to prevent the opponent from winning, return a random field with rotation 3
+        //if the program reaches this point, the AI has lost the game
+        //return a random field with rotation 3, since the game is lost anyway
         return new int[]{random.determineMove(board, mark)[0], 3};
     }
-    //seems to work, but always return 0, 0 if opponent doesn't have a winning move
 }

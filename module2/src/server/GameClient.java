@@ -20,14 +20,12 @@ public class GameClient extends Thread {
     private ArrayList<Player> players;
     private int currentPlayer;
     private int level;
-    private String currentBoard;
     private Player player = null;
     private String username;
     private String opponentUsername;
     private GameBoard board;
     private Thread logic;
     private ClientViewer viewer;
-    private Game game;
     private Lock lock = new ReentrantLock();
 
     Scanner scanner = new Scanner(System.in);
@@ -78,30 +76,7 @@ public class GameClient extends Thread {
     }
 
     public String getCurrentBoard() {
-        return currentBoard;
-    }
-
-    //set player - mark - ID connection
-   /* public void setSides() {
-        if (this.players.get(0).getName().equals(getUsername())) {
-            this.clientID = 0;
-            this.opponentUsername = this.players.get(this.clientID).getName();
-            this.players.get(0).assignMark(0);
-        } else {
-            this.clientID = 1;
-            this.opponentUsername = this.players.get(this.clientID).getName();
-            this.players.get(0).assignMark(1);
-        }
-    }*/
-
-    public void setOpponentUsername(String opponentUsername) {
-        this.opponentUsername = opponentUsername;
-        this.getViewer().displayOpponentUsername();
-    }
-
-    public void setBoard(String board){
-        this.currentBoard = board;
-        this.getViewer().displayCurrentBoard();
+        return board.toString();
     }
 
 
@@ -124,7 +99,8 @@ public class GameClient extends Thread {
 
 
 
-    public synchronized void setupGame(int currentPlayer) {//remove creation of boards for clients and assigning mark
+    public synchronized void setupGame(int currentPlayer) {
+        board.reset();
         switch(this.level){
             case 1:
                 Strategy strategy = new BasicStrategy();
@@ -138,7 +114,6 @@ public class GameClient extends Thread {
                 player = new HumanPlayer(getUsername(), Mark.OO);
                 break;
         }
-        player.assignMark(0);
         this.currentPlayer = currentPlayer;
         if (currentPlayer == 0) {
             sendMove();
@@ -148,18 +123,19 @@ public class GameClient extends Thread {
 
     public void sendMove() {
         currentPlayer = 0;
+        System.out.println(board.toString());
+        System.out.println();
         int[] move = player.turn(board);
         String command = Protocol.move(move[0], move[1]);
         writer.println(command);
         writer.flush();
-        System.out.println(board.toString());
     }
 
 
     public synchronized void move(int move, int rotation) {
         if (currentPlayer == 0) {
             board.setField(move, player.getMark());
-            if (rotation % 2 == 1) { //rotate to the left if rotation is uneven
+            if (rotation % 2 == 0) { //rotate to the left if rotation is uneven
                 board.rotateLeft(rotation / 2);
             } else { //else, rotate to the right
                 board.rotateRight(rotation / 2);
@@ -167,55 +143,16 @@ public class GameClient extends Thread {
             currentPlayer++;
         } else {
             board.setField(move, player.getMark().other());
-            if (rotation % 2 == 1) { //rotate to the left if rotation is uneven
+            if (rotation % 2 == 0) { //rotate to the left if rotation is uneven
                 board.rotateLeft(rotation / 2);
             } else { //else, rotate to the right
                 board.rotateRight(rotation / 2);
             }
-            System.out.println(board.toString());
             sendMove();
         }
     }
 
 
-    public int[] encodeRotation(int index) {
-        int[] result = new int[2];
-        switch (index) {
-            case 0:
-                result[0] = 0;
-                result[1] = 0;
-                break;
-            case 1:
-                result[0] = 0;
-                result[1] = 1;
-                break;
-            case 2:
-                result[0] = 1;
-                result[1] = 0;
-                break;
-            case 3:
-                result[0] = 1;
-                result[1] = 1;
-                break;
-            case 4:
-                result[0] = 2;
-                result[1] = 0;
-                break;
-            case 5:
-                result[0] = 2;
-                result[1] = 1;
-                break;
-            case 6:
-                result[0] = 3;
-                result[1] = 0;
-                break;
-            case 7:
-                result[0] = 3;
-                result[1] = 1;
-                break;
-        }
-        return result;
-    }
 
     //logic queries
     public synchronized void greeting(String name) {
@@ -231,7 +168,6 @@ public class GameClient extends Thread {
     }
 
     public void quit() {
-        viewer.endGame(getOpponentUsername() + " left.");
         String command = Protocol.quit();
         writer.println(command);
         writer.flush();
@@ -258,13 +194,13 @@ public class GameClient extends Thread {
     }
 
     public void ping() {
-        String command = Protocol.ping();
-        writer.println(command);
-        writer.flush();
+        System.out.println("PONG");
     }
 
     public void pong() {
-        System.out.println("PONG");
+        String command = Protocol.pong();
+        writer.println(command);
+        writer.flush();
     }
 
     public void run() {

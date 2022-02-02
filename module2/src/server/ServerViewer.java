@@ -44,8 +44,8 @@ public class ServerViewer extends Thread{
 
     public void displayServerStatus(){
 
-        System.out.println("Currently connected players: " + this.getServer().getClientHandlers().size());
-        System.out.println("Currently active games: " + this.getServer().getGames().size());
+        System.out.println("Currently connected players: " + getServer().getClientHandlers().size());
+        System.out.println("Currently active games: " + getServer().getBoards().size());
     }
 
     //commands

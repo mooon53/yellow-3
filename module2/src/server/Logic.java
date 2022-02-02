@@ -3,15 +3,13 @@ package src.server;
 import src.Protocol;
 
 import java.io.*;
-import java.sql.SQLOutput;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.locks.Lock;
 import java.util.concurrent.locks.ReentrantLock;
 
 public class Logic extends Thread {
     private GameServer server;
-    private GameClient player;
+    private GameClient client;
     private BufferedReader reader;
     private Lock lock = new ReentrantLock();
     private ClientHandler clientHandler;
@@ -36,7 +34,7 @@ public class Logic extends Thread {
      * @param client
      */
     public Logic(GameClient client) {
-        this.player = client;
+        this.client = client;
         try {
             this.reader = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
         } catch (IOException e) {
@@ -45,10 +43,10 @@ public class Logic extends Thread {
     }
 
 
-    //@requires player!=null;
+    //@requires client!=null;
     //@pure;
-    public GameClient getPlayer() {
-        return this.player;
+    public GameClient getClient() {
+        return this.client;
     }
 
     public ClientHandler getClientHandler() {
@@ -56,14 +54,15 @@ public class Logic extends Thread {
     }
 
 
-    public void receiveMessageFromClient() throws IOException{
+    public void receiveMessageFromClient(){
         while (true) {
-            String protocolMessage = null;
+            String protocolMessage;
             try {
                 protocolMessage = reader.readLine();
                 System.out.println(protocolMessage);
             } catch (IOException e) {
-                System.out.println("Pipiska");
+                this.clientHandler.shutDown();
+                break;
             }
             if (protocolMessage == null) {
                 this.clientHandler.shutDown();
@@ -83,10 +82,9 @@ public class Logic extends Thread {
                         this.getClientHandler().sendMessage(com);
                         break;
                     case HELLO:
-                        String uname = decode.get(1);//Client by name
-                        com = this.getClientHandler().getServer().greeting(uname);
+                        System.out.println(decode.get(1));
+                        com = this.getClientHandler().getServer().greeting();
                         this.getClientHandler().getServer().getViewer().displayServerStatus();
-                        System.out.println(com);
                         this.getClientHandler().sendMessage(com);
                         break;
                     case LIST:
@@ -96,21 +94,18 @@ public class Logic extends Thread {
                         break;
                     case QUEUE:
                         this.getClientHandler().getServer().addToQueue(this.clientHandler);
-                        System.out.println(this.getClientHandler().getServer().createGame());
+                        this.getClientHandler().getServer().createGame();
                         break;
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
                         int rotation = Integer.parseInt(decode.get(2));
-                        this.getClientHandler().getServer().makeMove(move, rotation, clientHandler.getUsername());
+                        this.getClientHandler().getServer().makeMove(move, rotation, clientHandler);
                         break;
                     case QUIT:
-                        com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
-                        System.out.println(com);
-                        this.getClientHandler().sendMessage(com);
-                        this.clientHandler.shutDown();
+                        clientHandler.shutDown();
                         break;
                     case PING:
-                        this.getClientHandler().getServer().pong();
+                        clientHandler.getServer().pong(clientHandler);
                         break;
                     case PONG:
                         this.getClientHandler().getServer().ping();
@@ -126,11 +121,12 @@ public class Logic extends Thread {
 
     public void receiveMessageFromServer() {
         while (true) {
-            String protocolMessage = null;
+            String protocolMessage;
             try {
                 protocolMessage = reader.readLine();
             } catch (IOException e) {
-                System.out.println("Syka blyat");
+                System.out.println("Server connection lost :(");
+                break;
             }
             if (protocolMessage == null) {
                 break;
@@ -140,44 +136,47 @@ public class Logic extends Thread {
             String command = decode.get(0);
             if (command != null) {
                 Protocol.CommandsIdentifier commandsIdentifier = Protocol.CommandsIdentifier.valueOf(command);
-                System.out.println(decode);
+                //System.out.println(decode); //for testing purposes
                 switch (commandsIdentifier) {
                     case LOGIN:
-                        this.getPlayer().joinList();
-                        //this.getPlayer().greeting(this.getPlayer().getUsername());
+                        this.getClient().joinList();
                         break;
                     case HELLO:
-                        this.getPlayer().login();
+                        this.getClient().login();
                         break;
                     case ALREADYLOGGEDIN:
-                        this.getPlayer().getViewer().announce("It seems such username already taken. Please, choose another one.^^");
-                        this.getPlayer().setConnection();
+                        this.getClient().getViewer().announce("It seems such username already taken. Please, choose another one.^^");
+                        this.getClient().setConnection();
                         break;
                     case LIST:
-                        this.getPlayer().joinQueue();
+                        this.getClient().joinQueue();
                         break;
                     case NEWGAME:
-                        if(decode.get(1).equals(this.getPlayer().getUsername())){
-                            this.getPlayer().setupGame(0);
-                        } else if (decode.get(2).equals(this.getPlayer().getUsername())){
-                            this.getPlayer().setupGame(1);
+                        if(decode.get(1).equals(this.getClient().getUsername())){
+                            this.getClient().setupGame(0);
+                        } else if (decode.get(2).equals(this.getClient().getUsername())){
+                            this.getClient().setupGame(1);
                         }
                         break;
                     case MOVE:
-                        this.getPlayer().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
+                        this.getClient().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
                         break;
                     case GAMEOVER:
                         String reason = decode.get(1);
-                        this.getPlayer().getViewer().endGame(reason);
+                        if (decode.size() > 2) {
+                            client.getViewer().endGame(reason, decode.get(2).equals(client.getUsername()));
+                        } else {
+                            client.getViewer().endGame(reason, false);
+                        }
                         break;
                     case QUIT:
-                        this.getPlayer().quit();
+                        this.getClient().quit();
                         break;
                     case PING:
-                        this.getPlayer().pong();
+                        this.getClient().pong();
                         break;
                     case PONG:
-                        this.getPlayer().ping();
+                        this.getClient().ping();
                         break;
                     default:
                         break;
@@ -189,15 +188,11 @@ public class Logic extends Thread {
     }
 
     public void run() {
-        if (this.player != null) {
+        if (this.client != null) {
             this.receiveMessageFromServer();
         }
         if (this.clientHandler != null) {
-            try {
-                this.receiveMessageFromClient();
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
+            this.receiveMessageFromClient();
         }
 
         try {

@@ -14,7 +14,7 @@ import java.net.Socket;
 public class ClientHandler extends Thread {
     private GameServer server;
     private Socket socket;
-    private Game game;
+    private GameBoard board;
     private String username;
     private Mark mark;
     private BufferedReader reader;
@@ -32,7 +32,7 @@ public class ClientHandler extends Thread {
             this.reader = new BufferedReader(new InputStreamReader(getSocket().getInputStream()));
             this.setupLogic();
         } catch (IOException e) {
-            close();
+            shutDown();
         }
     }
 
@@ -48,8 +48,8 @@ public class ClientHandler extends Thread {
     }
 
     //@pure;
-    public Game getGame() {
-        return game;
+    public GameBoard getBoard() {
+        return board;
     }
 
     //@pure;
@@ -95,7 +95,13 @@ public class ClientHandler extends Thread {
 
     }
 
+    public void setBoard(GameBoard board) {
+        this.board = board;
+    }
 
+    public void setMark(Mark mark) {
+        this.mark = mark;
+    }
 
 
 
@@ -116,13 +122,7 @@ public class ClientHandler extends Thread {
 
 
     public void shutDown() {
-        if (this.getGame() != null) {
-            //this.getGame().endDisconnect();
-            this.getServer().removeGame(this.getGame());
-        }
-        if (this.getUsername() != null) {
-            this.getServer().removeClient(this);
-        }
+        this.getServer().removeClient(this);
         close();
     }
 

@@ -4,22 +4,15 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import src.game.Player;
 import src.game.*;
-import src.server.Game;
 
 import static org.junit.jupiter.api.Assertions.*;
 
 public class GameTest {
     private GameBoard board;
-    private Game game;
-    private Player player1;
-    private Player player2;
 
     @BeforeEach
     public void setup(){
-        player1 = new HumanPlayer("player1", Mark.OO);
-        player2 = new HumanPlayer("player2", Mark.XX);
         board = new GameBoard();
-        //game = new Game(player1, player2);
     }
 
     @Test

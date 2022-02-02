@@ -30,7 +30,7 @@ public class SmartStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j % 2 == 1) {
+                    if (j % 2 == 0) {
                         copy.rotateLeft(j / 2);
                     } else {
                         copy.rotateRight(j / 2);
@@ -38,7 +38,7 @@ public class SmartStrategy implements Strategy {
                     //this prevents us from winning, if it's possible
                     int[] basicMove = basic.determineMove(copy, mark.other());
                     copy.setField(basicMove[0], mark.other());
-                    if (basicMove[1] % 2 == 1) {
+                    if (basicMove[1] % 2 == 0) {
                         copy.rotateLeft(basicMove[1] / 2);
                     } else {
                         copy.rotateRight(basicMove[1] / 2);
@@ -66,7 +66,7 @@ public class SmartStrategy implements Strategy {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j % 2 == 1) { //rotate to the left if j is uneven
+                    if (j % 2 == 0) { //rotate to the left if j is uneven
                         copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
                         copy.rotateRight(j / 2);
@@ -77,44 +77,8 @@ public class SmartStrategy implements Strategy {
                 }
             }
         }
-        //if there isn't a way to prevent the opponent from winning, return a random field with rotation 3
+        //if the program reaches this point, the AI has lost the game
+        //return a random field with rotation 3, since the game is lost anyway
         return new int[]{random.determineMove(board, mark)[0], 3};
-
-
-
-
-        /*int[] winningMove = basic.determineWinningMove(board, mark);
-        if (winningMove != null) { //if we can win, execute the move
-            return winningMove;
-        }
-
-        //next we check if the opponents has moves, such that we cannot prevent them from winning 1 turn later
-        for (int i = 0; board.isField(i); i++) {
-            for (int j = 0; j < 8; j++) {
-                GameBoard copy = (GameBoard) board.deepCopy();
-                if (copy.getField(i) == Mark.EMPTY) {
-                    copy.setField(i, mark.other());
-                    if (j % 2 == 1) { //rotate to the left if j is uneven
-                        copy.rotateLeft(j / 2);
-                    } else { //else, rotate to the right
-                        copy.rotateRight(j / 2);
-                    }
-                    //next, execute basicStrategy move on the copy board
-                    int[] basicMove = basic.determineMove(copy, mark);
-                    copy.setField(basicMove[0], mark);
-                    if (basicMove[1] % 2 == 1) {
-                        copy.rotateLeft(basicMove[1] / 2);
-                    } else {
-                        copy.rotateRight(basicMove[1] / 2);
-                    }
-                    //see if the opponent has a winning move now
-                    winningMove = basic.determineWinningMove(copy, mark.other());
-                    if (winningMove != null) {
-                        return new int[]{i, j};
-                    }
-
-                }
-            }
-        }*/
     }
 }

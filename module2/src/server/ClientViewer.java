@@ -42,18 +42,30 @@ public class ClientViewer extends Thread{
         Scanner scanner = new Scanner(System.in);
         System.out.println("Join host: ");
         String string = scanner.next();
-        try {
-            inetAddress= InetAddress.getByName(string);
-        } catch (UnknownHostException e) {
-            System.out.println(Protocol.error("unknown host"));
+        while (true) {
+            try {
+                inetAddress = InetAddress.getByName(string);
+                break;
+            } catch (UnknownHostException e) {
+                System.out.println(Protocol.error("unknown host"));
+                System.out.println("Join host: ");
+                string = scanner.next();
+            }
         }
         return inetAddress;
     }
 
     public int level(){
-        System.out.println("Choose type of game:\n -0: multiplayer \n -1: singleplayer(easy) \n -2: singleplayer(medium)");
-        int level = scanner.nextInt();
-        return level;
+        int level;
+        while (true) {
+            System.out.println("Choose type of game:\n -0: play as yourself \n -1: watch dumb AI play \n -2: watch smart AI play");
+            level = scanner.nextInt();
+            if (level >= 0 && level < 3) {
+                return level;
+            }
+            System.out.println("Wrong input, try again");
+        }
+
     }
 
     public void displayOpponentUsername(){
@@ -61,7 +73,7 @@ public class ClientViewer extends Thread{
     }
 
     public void displayCurrentBoard(){
-        System.out.println("Updated board:\n"+getClient().getCurrentBoard());
+        System.out.println(getClient().getCurrentBoard());
     }
 
     public void announce(String msg){
@@ -69,10 +81,16 @@ public class ClientViewer extends Thread{
     }
 
 
-    public void endGame(String reason){//add winners and draw
-        for(Player player : this.getClient().getPlayers()){
-            System.out.println(player.getName()+" disconnected.");
+    public void endGame(String reason, boolean won){
+        displayCurrentBoard();
+        if (reason.equals("DRAW")) {
+            System.out.println("There is no winner!");
+        } else if (won) {
+            System.out.println("You won because of " +reason);
+        } else {
+            System.out.println("You lost :(");
         }
+        client.joinQueue();
     }
 
 }

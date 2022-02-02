@@ -13,7 +13,7 @@ public class ComputerPlayer extends Player {
     }
 
     @Override
-    public int[] turn(GameBoard board){
+    public int[] turn(GameBoard board) {
         return strategy.determineMove(board, Mark.XX);
     }
 
