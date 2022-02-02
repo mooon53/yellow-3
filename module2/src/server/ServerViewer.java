@@ -32,12 +32,7 @@ public class ServerViewer extends Thread{
         return inetAddress;
     }
 
-    public int getPort(){
-        Scanner scanner = new Scanner(System.in);
-        System.out.println("Connect port: ");
-        int port = scanner.nextInt();
-        return port;
-    }
+
     public void displayLeftClients(ClientHandler clientHandler){
         System.out.println(clientHandler.getUsername()+" left game.");
     }
@@ -50,7 +45,7 @@ public class ServerViewer extends Thread{
 
     //commands
     public void announce(String msg){
-        System.out.println("<Server> "+msg);
+        System.out.println(msg);
     }
 
 

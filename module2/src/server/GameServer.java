@@ -14,7 +14,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
 
-public class GameServer extends Thread implements Server {
+public class GameServer extends Thread {
     private ArrayList<ClientHandler> clientHandlers;
     private ServerSocket serverSocket;
     private ServerViewer viewer;
@@ -36,12 +36,12 @@ public class GameServer extends Thread implements Server {
             clientHandlers = new ArrayList<>();
             queue = new ArrayList<>();
             setViewer();
-            System.out.println("_____Pentago Server_____");
+            this.getViewer().announce("_____Pentago Server_____");
             this.serverSocket = new ServerSocket(port);
             this.getViewer().announce("Connected to port: " + serverSocket.getLocalPort());
             this.getViewer().displayServerStatus();
         } catch (IOException e) {
-            System.out.println(Protocol.error("Unable to set connection"));
+            this.getViewer().announce("Unable to set connection"));
             this.stop();
         }
 
@@ -90,11 +90,6 @@ public class GameServer extends Thread implements Server {
         return giveGame;
     }
 
-    @Override
-    public synchronized void connect() {
-
-
-    }
 
     public void addClientHandler(ClientHandler clientHandler) {
         this.clientHandlers.add(clientHandler);
@@ -115,7 +110,7 @@ public class GameServer extends Thread implements Server {
         return command;
     }
 
-    @Override
+
     public int getPort() {
         return this.serverSocket.getLocalPort();
     }
@@ -188,9 +183,7 @@ public class GameServer extends Thread implements Server {
         } else if (side == 1) {
             this.game.getBoard().rotateLeft(choice);
         }
-        //System.out.println(this.game.getBoard().toString());
         String command = Protocol.move(index, rotation);
-        //the move is done, now we check if the game has ended
         if (game.getBoard().isFull() || game.getBoard().isWinner(Mark.XX) || game.getBoard().isWinner(Mark.OO)) {
             String gameOver;
             String winner = null;
@@ -294,7 +287,7 @@ public class GameServer extends Thread implements Server {
     }
 
     public void pong() {
-        System.out.println("PONG");
+        this.getViewer().announce("PONG");
     }
 
 
@@ -311,7 +304,7 @@ public class GameServer extends Thread implements Server {
             }
 
         } catch (IOException e) {
-            System.out.println(e.getMessage());
+            this.getViewer().announce(e.getMessage());
         }
     }
 

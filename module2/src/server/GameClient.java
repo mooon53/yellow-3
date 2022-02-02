@@ -44,7 +44,7 @@ public class GameClient extends Thread {
             setupLogic();
             setConnection();
         } catch (IOException e) {
-            System.out.println("Unable to join port.");
+           viewer.announce("Unable to join port.");
         }
 
     }
@@ -152,7 +152,7 @@ public class GameClient extends Thread {
         String command = Protocol.move(move[0], move[1]);
         writer.println(command);
         writer.flush();
-        System.out.println(board.toString());
+        viewer.announce(board.toString());
     }
 
 
@@ -172,7 +172,7 @@ public class GameClient extends Thread {
             } else { //else, rotate to the right
                 board.rotateRight(rotation / 2);
             }
-            System.out.println(board.toString());
+            viewer.announce(board.toString());
             sendMove();
         }
     }
@@ -244,7 +244,7 @@ public class GameClient extends Thread {
     }
 
     public synchronized void joinQueue() {
-        System.out.println("Play a game? 0-yes 1-no");
+        viewer.announce("Play a game? 0-yes 1-no");
         int choice = Integer.parseInt(scanner.next());
         if (choice == 0) {
             String command = Protocol.queue();
@@ -264,14 +264,14 @@ public class GameClient extends Thread {
     }
 
     public void pong() {
-        System.out.println("PONG");
+        viewer.announce("PONG");
     }
 
     public void run() {
         try {
             this.logic.join();
         } catch (InterruptedException e) {
-            System.out.println("Big oops..");
+            viewer.announce("Big oops..");
         }
     }
 

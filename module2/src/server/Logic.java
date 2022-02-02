@@ -26,7 +26,7 @@ public class Logic extends Thread {
         try {
             this.reader = new BufferedReader(new InputStreamReader(clientHandler.getSocket().getInputStream()));
         } catch (IOException e) {
-            System.out.println("Something went wrong while creating logic communicator.");
+           this.clientHandler.getServer().getViewer().announce("Something went wrong while creating logic communicator.");
         }
     }
 
@@ -40,7 +40,7 @@ public class Logic extends Thread {
         try {
             this.reader = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
         } catch (IOException e) {
-            System.out.println("Something went wrong while creating logic communicator.");
+            this.clientHandler.getServer().getViewer().announce("Something went wrong while creating logic communicator.");
         }
     }
 
@@ -61,9 +61,8 @@ public class Logic extends Thread {
             String protocolMessage = null;
             try {
                 protocolMessage = reader.readLine();
-                System.out.println(protocolMessage);
+                this.clientHandler.getServer().getViewer().announce(protocolMessage);
             } catch (IOException e) {
-                System.out.println("Pipiska");
             }
             if (protocolMessage == null) {
                 this.clientHandler.shutDown();
@@ -79,24 +78,24 @@ public class Logic extends Thread {
                     case LOGIN:
                         String name = decode.get(1);
                         com = this.getClientHandler().getServer().loginClient(name);
-                        System.out.println(com);
+                        this.clientHandler.getServer().getViewer().announce(com);
                         this.getClientHandler().sendMessage(com);
                         break;
                     case HELLO:
                         String uname = decode.get(1);//Client by name
                         com = this.getClientHandler().getServer().greeting(uname);
                         this.getClientHandler().getServer().getViewer().displayServerStatus();
-                        System.out.println(com);
+                        this.clientHandler.getServer().getViewer().announce(com);
                         this.getClientHandler().sendMessage(com);
                         break;
                     case LIST:
                         com = (this.getClientHandler().getServer().sendList());
-                        System.out.println(com);
+                        this.clientHandler.getServer().getViewer().announce(com);
                         this.getClientHandler().sendMessage(com);
                         break;
                     case QUEUE:
                         this.getClientHandler().getServer().addToQueue(this.clientHandler);
-                        System.out.println(this.getClientHandler().getServer().createGame());
+                        this.clientHandler.getServer().getViewer().announce(this.getClientHandler().getServer().createGame());
                         break;
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
@@ -105,7 +104,7 @@ public class Logic extends Thread {
                         break;
                     case QUIT:
                         com = this.getClientHandler().getServer().removeClient(this.getClientHandler());
-                        System.out.println(com);
+                        this.clientHandler.getServer().getViewer().announce(com);
                         this.getClientHandler().sendMessage(com);
                         this.clientHandler.shutDown();
                         break;
@@ -130,7 +129,6 @@ public class Logic extends Thread {
             try {
                 protocolMessage = reader.readLine();
             } catch (IOException e) {
-                System.out.println("Syka blyat");
             }
             if (protocolMessage == null) {
                 break;
@@ -140,7 +138,7 @@ public class Logic extends Thread {
             String command = decode.get(0);
             if (command != null) {
                 Protocol.CommandsIdentifier commandsIdentifier = Protocol.CommandsIdentifier.valueOf(command);
-                System.out.println(decode);
+                this.getPlayer().getViewer().announce(protocolMessage);
                 switch (commandsIdentifier) {
                     case LOGIN:
                         this.getPlayer().joinList();
@@ -203,7 +201,7 @@ public class Logic extends Thread {
         try {
             reader.close();
         } catch (IOException e) {
-            System.out.println(Protocol.error());
+            this.getPlayer().getViewer().announce(Protocol.error());
         }
     }
 }
