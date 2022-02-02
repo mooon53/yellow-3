@@ -6,6 +6,7 @@ University of Twente. Technical Computer Science/Applied Mathematics M2:Software
 * [Protocol](#protocol)
 * [Testing](#testing)
 * [Screenshots](#screenshots)
+* [Contacts](#contacts)
 
 ##General info
 
@@ -27,6 +28,9 @@ To login for the server, type your username after the port was accepted. In case
 
 To start game choose game option by choosing suitable for you option. After that, you are asked whether to start game. By answering 0 you join the queue to find the second player in case of multiplayer option, otherwise the game starts immediately. When the game is started, mark are assigned automatically and the first move is suggested to one of the players. Players exchange moves one by one until game is over as described in the rules or some of the players has disconnected.
 
+##Protocol 
+https://gitlab.utwente.nl/software-systems/2021-2022/pentago-protocol/-/blob/master/commands.md#hello-server
+
 ##Testing
 MVC pattern was used when creating a project. Testing for model part is performed as white-box testing using JUnit5. Controller (server) testing was completed in terms of black-bocks as the project supports multithreading and all data exchange between client and server includes many connected methods that are necessary to complete the program correctly.
 As unit tests we present:
@@ -40,3 +44,8 @@ As unit tests we present:
 4. ComputerTest - (TO WRITE)
 
 ##Screenshots
+
+##Contacts
+Project group:
+* Niels van Duijl (n.vanduijl@student.utwente.nl)
+* Katy Radzkova (k.radzkova@student.utwente.nl)
