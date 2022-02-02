@@ -49,6 +49,7 @@ public class GameTest {
         board.setField(5,Mark.XX);
         board.winLine(Mark.XX);
         assertTrue(board.winLine(Mark.XX));
+
     }
 
     @Test
