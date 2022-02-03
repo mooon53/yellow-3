@@ -1,25 +1,16 @@
 package src;
 
-import src.game.Mark;
 
 import java.util.*;
 
 public class Protocol {
     /**
-     * board dimension
-     */
-    public static final int[] DIMS = {6, 6};
-    /**
-     * argument separator
+     * argument separator.
      */
     public static final String AS = "~";
-    /**
-     * command separator
-     */
-    public static final String CS = "\n";
 
     /**
-     * CommandsIdentifiers to save meaning of commands
+     * CommandsIdentifiers to save meaning of commands.
      */
     public enum CommandsIdentifier {
         HELLO, //greeting
@@ -33,112 +24,88 @@ public class Protocol {
         PONG, //receive
         QUIT, //disconnect
         ERROR, //the command is triggered by error
-        QUEUE; //waiting queue of players
+        QUEUE //waiting queue of players
     }
 
 
 
     /**
-     * Transform received string to protocol format
+     * Transform received string to protocol format.
      *
-     * @param Pstring protocol format string
-     * @return
+     * @param string protocol format string
+     * @return list of strings, created by splitting the original string with ~
      */
-    public static List<String> decodeProtocolMessage(String Pstring) {
-        List<String> list = Arrays.asList(Pstring.split(AS));
-        return list;
-    }
-
-
-    public static String[] parseCommands(String line){
-        return line.strip().split(CS);
-    }
-
-    public static String[] parseArr(String line) {
-        return line.strip().split(AS);
-    }
-
-    public static String encodeArray(String[] array){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(int i = 0; i< array.length; i++){
-            stringBuilder.append(array[i]);
-            if (i != array.length-1){
-                stringBuilder.append(AS);
-            }
-        }
-        stringBuilder.append(CS);
-        return stringBuilder.toString();
+    public static List<String> decodeProtocolMessage(String string) {
+        return Arrays.asList(string.split(AS));
     }
 
 
 
-    public static String greeting(String text){
-        //System.out.println("HELLO"+AS+text);
-        return "HELLO"+AS+text;
+    public static String greeting(String text) {
+        return "HELLO" + AS + text;
     }
 
 
-    public static String error (String message){
-        return "ERROR~"+message;
+    public static String error(String message) {
+        return "ERROR~" + message;
     }
 
-    public static String error(){
+    public static String error() {
         return "ERROR";
     }
 
     //----------------------------------------------------
-    public static String newGame(String player1, String player2){
-        return "NEWGAME~"+player1+"~"+player2;
+    public static String newGame(String player1, String player2) {
+        return "NEWGAME~" + player1 + "~" + player2;
     }
-    public static String login(String username){
-        return "LOGIN~"+username;
+    public static String login(String username) {
+        return "LOGIN~" + username;
     }
-    public static String login(){
+    public static String login() {
         return "LOGIN";
     }
-    public static String move(int index, int rotation){
-        return "MOVE~"+index+AS+rotation;
+    public static String move(int index, int rotation) {
+        return "MOVE~" + index + AS + rotation;
     }
-    public static String gameover(String reason, String username){
+    public static String gameover(String reason, String username) {
         if (reason.equals("DRAW")) {
             return "GAMEOVER" + AS + "DRAW";
         } else {
             return "GAMEOVER" + AS + reason + AS + username;
         }
     }
-    public static String list(ArrayList<String> names){
+    public static String list(ArrayList<String> names) {
         String res = "LIST";
-        for(String name : names){
-            res+=(AS+name);
+        for (String name : names) {
+            res += AS + name;
         }
         return res;
     }
 
-    public static String list(){
+    public static String list() {
         return "LIST";
     }
 
-    public static String queue(){
+    public static String queue() {
         return "QUEUE";
     }
-    public static String queue(String username){
-        return "QUEUE"+AS+username;
+    public static String queue(String username) {
+        return "QUEUE" + AS + username;
     }
 
-    public static String alreadyLoggedIn(){
+    public static String alreadyLoggedIn() {
         return "ALREADYLOGGEDIN";
     }
 
-    public static String quit(){
+    public static String quit() {
         return "QUIT";
     }
 
-    public static String ping(){
+    public static String ping() {
         return "PING";
     }
 
-    public static String pong(){
+    public static String pong() {
         return "PONG";
     }
 

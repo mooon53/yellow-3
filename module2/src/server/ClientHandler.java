@@ -1,11 +1,8 @@
 package src.server;
 
 
-import src.Protocol;
 import src.game.GameBoard;
-import src.game.HumanPlayer;
 import src.game.Mark;
-import src.game.Player;
 
 import java.io.*;
 import java.net.Socket;
@@ -19,9 +16,6 @@ public class ClientHandler extends Thread {
     private Mark mark;
     private BufferedReader reader;
     private PrintStream writer;
-    private Thread logic;
-    private int clienthandlerID;
-    private boolean yourTurn = true;
 
 
     public ClientHandler(Socket socket, GameServer server) {
@@ -30,7 +24,7 @@ public class ClientHandler extends Thread {
             this.server = server;
             this.writer = new PrintStream(getSocket().getOutputStream());
             this.reader = new BufferedReader(new InputStreamReader(getSocket().getInputStream()));
-            this.setupLogic();
+            setupLogic();
         } catch (IOException e) {
             shutDown();
         }
@@ -41,10 +35,6 @@ public class ClientHandler extends Thread {
     //@pure;
     public String getUsername() {
         return this.username;
-    }
-
-    public void setUsername(String username) {
-        this.username = username;
     }
 
     //@pure;
@@ -63,11 +53,6 @@ public class ClientHandler extends Thread {
     }
 
     //@pure;
-    public Thread getLogic() {
-        return logic;
-    }
-
-    //@pure;
     public GameServer getServer() {
         return server;
     }
@@ -76,13 +61,14 @@ public class ClientHandler extends Thread {
     //queries
 
 
-    public synchronized void setupLogic() {
+    private synchronized void setupLogic() {
         try {
-            logic = new Logic(this);
-            this.reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-            new Thread(this.logic).start();
+            Thread logic = new Logic(this);
+            reader = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+            new Thread(logic).start();
         } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Something went wrong when setting up logic");
+            shutDown();
         }
 
     }
@@ -103,9 +89,13 @@ public class ClientHandler extends Thread {
         this.mark = mark;
     }
 
+    public void setUsername(String username) {
+        this.username = username;
+    }
 
 
-    public void close() {
+    public void shutDown() {
+        this.getServer().removeClient(this);
         try {
             if (socket != null && reader != null && writer != null) {
                 socket.close();
@@ -115,16 +105,5 @@ public class ClientHandler extends Thread {
         } catch (IOException e) {
             e.printStackTrace();
         }
-
     }
-
-
-
-
-    public void shutDown() {
-        this.getServer().removeClient(this);
-        close();
-    }
-
-
 }

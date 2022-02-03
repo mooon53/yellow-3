@@ -182,6 +182,7 @@ public class GameServer extends Thread {
         for (String player : this.loggedPlayers) {
             if (player != null && !player.equals("") && player.equals(username)) {
                 is = false;
+                break;
             }
         }
         return is;

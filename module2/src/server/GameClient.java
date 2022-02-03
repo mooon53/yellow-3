@@ -9,31 +9,24 @@ import src.game.Player;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.net.Socket;
-import java.util.ArrayList;
 import java.util.Scanner;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class GameClient extends Thread {
     private Socket socket;
     private PrintStream writer;
-    private ArrayList<Player> players;
     private int currentPlayer;
     private int level;
     private Player player = null;
     private String username;
-    private String opponentUsername;
     private GameBoard board;
     private Thread logic;
     private ClientViewer viewer;
-    private Lock lock = new ReentrantLock();
 
     Scanner scanner = new Scanner(System.in);
 
     public GameClient() {
-        this.viewer = new ClientViewer(this);
+        viewer = new ClientViewer(this);
         Thread view = new Thread(viewer);
-        players = new ArrayList<>();
         view.start();
         this.board = new GameBoard();
         try {
@@ -57,24 +50,12 @@ public class GameClient extends Thread {
         return viewer;
     }
 
-    public ArrayList<Player> getPlayers() {
-        return players;
-    }
-
-    public int getCurrentPlayer() {
-        return currentPlayer;
-    }
-
     //@pure;
     public String getUsername() {
         return username;
     }
 
     //@pure;
-    public String getOpponentUsername() {
-        return opponentUsername;
-    }
-
     public String getCurrentBoard() {
         return board.toString();
     }
@@ -83,25 +64,22 @@ public class GameClient extends Thread {
 
 
     public synchronized void setupLogic() {
-        Logic logicc = new Logic(this);
-        this.logic = new Thread(logicc);
-        this.logic.start();
+        logic = new Thread(new Logic(this));
+        logic.start();
     }
 
 
     public synchronized void setConnection() {
-        String username = viewer.getClientName();
-        int level = viewer.level();
-        this.level = level;
-        this.username = username;
+        username = viewer.getClientName();
+        level = viewer.level();
         greeting(username);
     }
 
 
 
-    public synchronized void setupGame(int currentPlayer) {
+    public synchronized void setupGame(int currentPlay) {
         board.reset();
-        switch(this.level){
+        switch (level) {
             case 1:
                 Strategy strategy = new BasicStrategy();
                 player = new ComputerPlayer(strategy, Mark.OO);
@@ -114,7 +92,7 @@ public class GameClient extends Thread {
                 player = new HumanPlayer(getUsername(), Mark.OO);
                 break;
         }
-        this.currentPlayer = currentPlayer;
+        currentPlayer = currentPlay;
         if (currentPlayer == 0) {
             sendMove();
         }
@@ -135,7 +113,7 @@ public class GameClient extends Thread {
     public synchronized void move(int move, int rotation) {
         if (currentPlayer == 0) {
             board.setField(move, player.getMark());
-            if (rotation % 2 == 0) { //rotate to the left if rotation is uneven
+            if (rotation % 2 == 0) { //rotate to the left if rotation is even
                 board.rotateLeft(rotation / 2);
             } else { //else, rotate to the right
                 board.rotateRight(rotation / 2);
@@ -143,9 +121,9 @@ public class GameClient extends Thread {
             currentPlayer++;
         } else {
             board.setField(move, player.getMark().other());
-            if (rotation % 2 == 0) { //rotate to the left if rotation is uneven
+            if (rotation % 2 == 0) {
                 board.rotateLeft(rotation / 2);
-            } else { //else, rotate to the right
+            } else {
                 board.rotateRight(rotation / 2);
             }
             sendMove();
@@ -156,7 +134,7 @@ public class GameClient extends Thread {
 
     //logic queries
     public synchronized void greeting(String name) {
-        String command = Protocol.greeting("Client by "+name);
+        String command = Protocol.greeting("Client by " + name);
         writer.println(command);
         writer.flush();
     }

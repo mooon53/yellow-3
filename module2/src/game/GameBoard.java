@@ -1,16 +1,15 @@
 package src.game;
 
-public class GameBoard extends AbstractBoard{
-    /*public invariant fields.length == DIM*DIM;
-    public invariant (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY || fields[i] == Mark.XX || fields[i] == Mark.OO);
-    @*/
+public class GameBoard extends AbstractBoard {
+    //@public invariant fields.length == DIM*DIM;
+    //@public invariant (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] != null);
 
     public final static int DIM = 6;
-    public final static String DELIM = "     ";
-    public final static String LINE = "---+---+---+---+---+---";
-    private static final String[] NUMBERING = {" 0 | 1 | 2 | 3 | 4 | 5 ", " 6 | 7 | 8 | 9 |10 |11 ",
-            "12 |13 |14 |15 |16 |17 ", "18 |19 |20 |21 |22 |23 ",
-            "24 |25 |26 |27 |28 |29 ", "30 |31 |32 |33 |34 |35 "};
+    private final static String DELIM = "     ";
+    private final static String LINE = "---+---+---+---+---+---";
+    private final static String[] NUMBERS = {" 0 | 1 | 2 | 3 | 4 | 5 ", " 6 | 7 | 8 | 9 |10 |11 ",
+        "12 |13 |14 |15 |16 |17 ", "18 |19 |20 |21 |22 |23 ",
+        "24 |25 |26 |27 |28 |29 ", "30 |31 |32 |33 |34 |35 "};
 
     /* Board should be shown as follows (with toString())
      0 | 1 | 2 | 3 | 4 | 5
@@ -35,10 +34,10 @@ public class GameBoard extends AbstractBoard{
     //@ ensures (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY);
     public GameBoard() {
         super(DIM);
-        subBoards[0] = new SubBoard(DIM/2);
-        subBoards[1] = new SubBoard(DIM/2);
-        subBoards[2] = new SubBoard(DIM/2);
-        subBoards[3] = new SubBoard(DIM/2);
+        subBoards[0] = new SubBoard(DIM / 2);
+        subBoards[1] = new SubBoard(DIM / 2);
+        subBoards[2] = new SubBoard(DIM / 2);
+        subBoards[3] = new SubBoard(DIM / 2);
     }
 
     /**
@@ -49,13 +48,13 @@ public class GameBoard extends AbstractBoard{
     //@requires isField(i);
     //@ensures \result >= 0 && \result < 4;
     public int getSubBoard(int i) {
-        int row = i/DIM;
-        int col = i%DIM;
+        int row = i / DIM;
+        int col = i % DIM;
         int result = 0;
-        if (col >= DIM/2) {
+        if (col >= DIM / 2) {
             result++;
         }
-        if (row >= DIM/2) {
+        if (row >= DIM / 2) {
             result += 2;
         }
         return result;
@@ -69,8 +68,8 @@ public class GameBoard extends AbstractBoard{
     @Override
     public void setField(int i, Mark mark) {
         int index = getSubBoard(i);
-        int row = (i/DIM)%(DIM/2);
-        int col = (i%DIM)%(DIM/2);
+        int row = (i / DIM) % (DIM / 2);
+        int col = (i % DIM) % (DIM / 2);
         int j = subBoards[0].getIndex(row, col);
         subBoards[index].setField(j, mark);
         fields[i] = mark;
@@ -78,11 +77,14 @@ public class GameBoard extends AbstractBoard{
 
 
     /**
-     * Creates a deepCopy of this GameBoard, with the subBoards also copied over
+     * Creates a deepCopy of this GameBoard, with the subBoards also copied over.
      * @return the copied board
      */
-    //@ensures (\forall int i; i>= 0 && i < 4;\result.subBoards[i] != this.subBoards[i]);
-    //@ensures (\forall int i; i>= 0 && i < 4; (\forall int j; (j >= 0 && j < dim*dim); \result.subBoards[i].fields[j] == this.subBoards[i].fields[j]));
+    /*@
+    ensures (\forall int i; i>= 0 && i < 4;\result.subBoards[i] != this.subBoards[i]);
+    ensures (\forall int i; i>= 0 && i < 4; (\forall int j; (j >= 0 && j < dim*dim);
+    \result.subBoards[i].fields[j] == this.subBoards[i].fields[j]));
+    */
     @Override
     public GameBoard deepCopy() {
         GameBoard copyBoard = new GameBoard();
@@ -94,7 +96,7 @@ public class GameBoard extends AbstractBoard{
 
 
     /**
-     * Rotates the given subBoard to the right
+     * Rotates the given subBoard to the right.
      * @param i the index of the subBoard
      */
     //@requires i >= 0 && i < 4;
@@ -105,7 +107,7 @@ public class GameBoard extends AbstractBoard{
 
 
     /**
-     * Rotates the given subBoard to the left
+     * Rotates the given subBoard to the left.
      * @param i the index of the subBoard
      */
     //@requires i >= 0 && i < 4;
@@ -121,56 +123,56 @@ public class GameBoard extends AbstractBoard{
      */
     //@requires index >= 0 && index < 4;
     public void updateBoard(int index) {
-        int row = DIM/2;
-        int col = DIM/2;
-        if (index%2 == 0) {
+        int row = DIM / 2;
+        int col = DIM / 2;
+        if (index % 2 == 0) {
             col = 0;
         }
         if (index < 2) {
             row = 0;
         }
-        for(int i = 0; i < DIM/2; i++)  {
-            for(int j = 0; j < DIM/2; j++) {
-                fields[getIndex(row+ i, col + j)] = subBoards[index].getField(i , j);
+        for (int i = 0; i < DIM / 2; i++)  {
+            for (int j = 0; j < DIM / 2; j++) {
+                fields[getIndex(row + i, col + j)] = subBoards[index].getField(i, j);
             }
         }
     }
 
-    public void reset(){
-        for (int i = 0; i<DIM*DIM;i++){
-            setField(i,Mark.EMPTY);
+    public void reset() {
+        for (int i = 0; i < DIM * DIM; i++) {
+            setField(i, Mark.EMPTY);
         }
     }
 
     public boolean isFull() {
         boolean result = true;
-        for(int i = 0; i<DIM*DIM; i++){
-            if(getField(i).equals(Mark.EMPTY)){
+        for (int i = 0; i < DIM * DIM; i++) {
+            if (getField(i).equals(Mark.EMPTY)) {
                 result = false;
             }
         }
         return result;
     }
     /**
-     * Check whether a given mark covers a line by winning conditions
+     * Check whether a given mark covers a line by winning conditions.
      * @param mark represents a mark to check
      * @return true if there are 5 marks in a row
      */
     //@requires mark != Mark.EMPTY;
-    public boolean winLine(Mark mark){
+    public boolean winLine(Mark mark) {
         boolean result = false;
         int counter;
-        for(int row=0; row<DIM; row++){
+        for (int row = 0; row < DIM; row++) {
             counter = 0;
-            for(int col = 0; col< DIM; col++){
-                if (!(getField(row,col).equals(mark)) && col > 0){
+            for (int col = 0; col < DIM; col++) {
+                if (!(getField(row, col).equals(mark)) && col > 0) {
                     break;
-                } else if (getField(row,col).equals(mark)){
+                } else if (getField(row, col).equals(mark)) {
                     counter++;
-                } else{
+                } else {
                     continue;
                 }
-                if (counter==5){
+                if (counter == 5) {
                     result = true;
                 }
             }
@@ -179,24 +181,24 @@ public class GameBoard extends AbstractBoard{
     }
 
     /**
-     * Check whether a given mark covers a column by winning conditions
+     * Check whether a given mark covers a column by winning conditions.
      *@param mark represents a mark to check
      *@return true if there are 5 marks in a column
      */
-    public boolean winCol (Mark mark){
+    public boolean winCol(Mark mark) {
         boolean result = false;
         int counter;
-        for(int col=0; col<DIM; col++){
+        for (int col = 0; col < DIM; col++) {
             counter = 0;
-            for(int row = 0; row< DIM; row++){
-                if (!(getField(row,col).equals(mark)) && row > 0){
+            for (int row = 0; row < DIM; row++) {
+                if (!(getField(row, col).equals(mark)) && row > 0) {
                     break;
-                } else if (getField(row,col).equals(mark)){
+                } else if (getField(row, col).equals(mark)) {
                     counter++;
-                } else{
+                } else {
                     continue;
                 }
-                if (counter==5){
+                if (counter == 5) {
                     result = true;
                 }
             }
@@ -204,58 +206,59 @@ public class GameBoard extends AbstractBoard{
         return result;
     }
 
-    public boolean winDiagonal(Mark mark){
+    public boolean winDiagonal(Mark mark) {
         int counter1 = 0;
         int counter2 = 0;
-        for (int pair = 0; pair<DIM; pair+=1){
-            if(!getField(pair,pair).equals(mark) && pair > 0){
+        for (int pair = 0; pair < DIM; pair += 1) {
+            if (!getField(pair, pair).equals(mark) && pair > 0) {
                 break;
-            } else if (getField(pair,pair).equals(mark)){
+            } else if (getField(pair, pair).equals(mark)) {
                 counter1++;
             }
         }
-        for (int pair = 0; pair<DIM; pair+=1){
-            if(!getField((DIM-1-pair),pair).equals(mark) && pair>0){
+        for (int pair = 0; pair < DIM; pair += 1) {
+            if (!getField(DIM - 1 - pair, pair).equals(mark) && pair > 0) {
                 break;
-            } else if (getField((DIM-1-pair),pair).equals(mark)){
+            } else if (getField(DIM - 1 - pair, pair).equals(mark)) {
                 counter2++;
             }
         }
-        return (counter1>=DIM-1) || (counter2>=DIM-1);
+        return counter1 >= DIM - 1 || counter2 >= DIM - 1;
 
     }
 
-    public boolean winIrregularDiagonal(Mark mark){
+    public boolean winIrregularDiagonal(Mark mark) {
         int counter1 = 0;
         int counter2 = 0;
         //right irregular diagonal : starts from 1 or 6
-        for(int i = 1; i<DIM*DIM; i+=(DIM+1)){
-            if (getField(i).equals(mark)){
+        for (int i = 1; i < DIM * DIM; i += DIM + 1) {
+            if (getField(i).equals(mark)) {
                 counter1++;
-            } else if(i ==1 && getField(i+(DIM-1)).equals(mark)){
+            } else if (i == 1 && getField(i + (DIM - 1)).equals(mark)) {
                 counter1++;
-                i+=DIM-1;
-            } else{
+                i += DIM - 1;
+            } else {
                 break;
             }
         }
         //left irregular diagonal : starts from 4 or 11
-        for (int i = (DIM-2); i<DIM*DIM; i+=(DIM-1)){
-            if(getField(i).equals(mark)){
+        for (int i = DIM - 2; i < DIM * DIM; i += DIM - 1) {
+            if (getField(i).equals(mark)) {
                 counter2++;
-            } else if (i==4 && getField(i+(DIM+1)).equals(mark)){
+            } else if (i == 4 && getField(i + DIM + 1).equals(mark)) {
                 counter2++;
-                i+=DIM+1;
-            } else{
+                i += DIM + 1;
+            } else {
                 break;
             }
         }
 
-        return counter1==5 || counter2==5;
+        return counter1 == 5 || counter2 == 5;
     }
 
     /**
-     * Returns a String representation of the board, such that the state of the board and the indexes of the fields are clear.
+     * Returns a String representation of the board, such that the current board state is clear.
+     * Also shows the indexes of the fields
      */
     public String toString() {
         String s = "";
@@ -267,7 +270,7 @@ public class GameBoard extends AbstractBoard{
                     row = row + "|";
                 }
             }
-            s = s + row + DELIM + NUMBERING[i];
+            s = s + row + DELIM + NUMBERS[i];
             if (i < DIM - 1) {
                 s = s + "\n" + LINE + DELIM + LINE + "\n";
             }
@@ -277,12 +280,12 @@ public class GameBoard extends AbstractBoard{
 
     /**
      * Checks if a Mark (that isn't Mark.EMPTY) fulfills a win-condition.
-     * @param candidate represents the mark of player
+     * @param mark represents the mark of player
      * @return true if one of players is a winner in either direction
      */
-    //@requires !candidate.equals(Mark.EMPTY);
-    public boolean isWinner(Mark candidate){
-        return winLine(candidate) || winCol(candidate) || winDiagonal(candidate) || winIrregularDiagonal(candidate);
+    //@requires !mark.equals(Mark.EMPTY);
+    public boolean isWinner(Mark mark) {
+        return winLine(mark) || winCol(mark) || winDiagonal(mark) || winIrregularDiagonal(mark);
     }
 
 }

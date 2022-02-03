@@ -1,45 +1,30 @@
 package src.server;
 
 import src.Protocol;
-import src.game.Player;
-
 import java.net.InetAddress;
 import java.net.UnknownHostException;
-import java.sql.SQLOutput;
 import java.util.Scanner;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
-public class ClientViewer extends Thread{
+public class ClientViewer extends Thread {
     private GameClient client;
-    Scanner scanner = new Scanner(System.in);
+    private Scanner scanner = new Scanner(System.in);
 
-    public  ClientViewer(GameClient client){
+    public ClientViewer(GameClient client) {
         this.client = client;
     }
 
-    //getters
-    //@pure;
-    public GameClient getClient() {
-        return client;
-    }
-
-
     //methods
-    public synchronized String getClientName(){
+    public synchronized String getClientName() {
         System.out.println("Username: ");
-        String name = scanner.next();
-        return name;
+        return scanner.next();
     }
 
-    public int getPort(){
+    public int getPort() {
         System.out.println("Join port: ");
-        int port = scanner.nextInt();
-        return  port;
+        return scanner.nextInt();
     }
-    public InetAddress getInetAddress(){
-        InetAddress inetAddress=null;
-        Scanner scanner = new Scanner(System.in);
+    public InetAddress getInetAddress() {
+        InetAddress inetAddress;
         System.out.println("Join host: ");
         String string = scanner.next();
         while (true) {
@@ -55,10 +40,11 @@ public class ClientViewer extends Thread{
         return inetAddress;
     }
 
-    public int level(){
+    public int level() {
         int level;
         while (true) {
-            System.out.println("Choose type of game:\n -0: play as yourself \n -1: watch dumb AI play \n -2: watch smart AI play");
+            System.out.println("Choose type of game:\n -0: play as yourself " +
+                    "\n -1: watch dumb AI play \n -2: watch smart AI play");
             level = scanner.nextInt();
             if (level >= 0 && level < 3) {
                 return level;
@@ -68,25 +54,21 @@ public class ClientViewer extends Thread{
 
     }
 
-    public void displayOpponentUsername(){
-        System.out.println("Your opponent: "+getClient().getOpponentUsername());
+    public void displayCurrentBoard() {
+        System.out.println(client.getCurrentBoard());
     }
 
-    public void displayCurrentBoard(){
-        System.out.println(getClient().getCurrentBoard());
-    }
-
-    public void announce(String msg){
+    public void announce(String msg) {
         System.out.println(msg);
     }
 
 
-    public void endGame(String reason, boolean won){
+    public void endGame(String reason, boolean won) {
         displayCurrentBoard();
         if (reason.equals("DRAW")) {
             System.out.println("There is no winner!");
         } else if (won) {
-            System.out.println("You won because of " +reason);
+            System.out.println("You won because of " + reason);
         } else {
             System.out.println("You lost :(");
         }

@@ -9,7 +9,7 @@ public interface Strategy {
      * Each strategy has a name.
      * @return the name of the strategy
      */
-    public String getName();
+    String getName();
 
     /**
      * Determines the next move according to the strategy used.
@@ -18,5 +18,5 @@ public interface Strategy {
      * @param mark the mark that the player uses
      * @return the determined move in an array of integers
      */
-    public int[] determineMove(Board board, Mark mark);
+    int[] determineMove(Board board, Mark mark);
 }

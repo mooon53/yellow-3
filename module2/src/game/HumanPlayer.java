@@ -1,6 +1,5 @@
 package src.game;
 
-import src.Protocol;
 import src.ai.DumbStrategy;
 
 import java.util.Scanner;
@@ -18,7 +17,8 @@ public class HumanPlayer extends Player {
     public int[] turn(GameBoard board) {
         int[] result = new int[2];
         Scanner scanner = new Scanner(System.in);
-        String prompt = ">" + getName() + " your turn: \n Enter the index of a field, or enter HINT for an example move";
+        String prompt = ">" + getName() + " your turn: \n " +
+                "Enter the index of a field, or enter HINT for an example move";
         System.out.println(prompt);
         String input = scanner.nextLine();
         if (input.equalsIgnoreCase("hint")) {
@@ -29,8 +29,8 @@ public class HumanPlayer extends Player {
             } else {
                 rotation = "right";
             }
-            System.out.println("Example move: enter field " +example[0]+
-                    ", rotate subboard " +example[1]/2+ ", and rotate it to the " +rotation);
+            System.out.println("Example move: enter field " + example[0] +
+                    ", rotate subboard " + example[1] / 2 + ", and rotate it to the " + rotation);
             result[0] = scanner.nextInt();
         } else {
             result[0] = Integer.parseInt(input);
@@ -41,12 +41,12 @@ public class HumanPlayer extends Player {
             result[0] = scanner.nextInt();
             free = result[0] >= 0 && result[0] < 36;
         }
-        System.out.println("Which subboard do you want to rotate?");
-        System.out.println("Enter 0 for top left, 1 for top right, 2 for bottom left, 3 for bottom right");
+        System.out.println("Which subboard do you want to rotate? \n Enter 0 for top left, " +
+                "1 for top right, 2 for bottom left, 3 for bottom right");
         //take input from user as index of subBoard
         int rotation = scanner.nextInt();
         //check whether the given index is valid
-        free =rotation >= 0 && rotation < 4;
+        free = rotation >= 0 && rotation < 4;
         //in case chosen field is occupied, ask user to input another index until it is free
         while (!free) {
             System.out.println("Oops, chosen index is not valid. Try again: ");
@@ -65,7 +65,7 @@ public class HumanPlayer extends Player {
             direction = scanner.nextInt();
             free = direction == 0 || direction == 1;
         }
-        result[1] = (rotation*2) +direction;
+        result[1] = (rotation * 2) + direction;
         return result;
     }
 

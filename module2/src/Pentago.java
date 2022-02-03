@@ -19,11 +19,9 @@ public class Pentago {
     }
 
     public static void startClient() {
-            GameClient client = new GameClient();
-            Thread c = new Thread(client);
-            c.start();
-
-
+        GameClient client = new GameClient();
+        Thread c = new Thread(client);
+        c.start();
     }
 
 

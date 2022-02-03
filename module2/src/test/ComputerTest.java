@@ -11,7 +11,7 @@ import src.game.Mark;
 import static org.junit.jupiter.api.Assertions.*;
 
 /**
- * A test file with toString methods to see AI behaviour when they play against each other
+ * A test file with toString methods to see AI behaviour when they play against each other.
  * It doesn't actually assert much, but it prints the board state for every move, so you can see what's happening
  */
 public class ComputerTest {
@@ -25,7 +25,7 @@ public class ComputerTest {
 
     @Disabled
     @Test
-    public void testRandomGame() { //not a real test since it doesn't assert anything, but we can see what happens in the console
+    public void testRandomGame() {
         strategy = new DumbStrategy();
         playGame();
     }
@@ -46,7 +46,7 @@ public class ComputerTest {
     }
 
     /**
-     * Plays a game with all the moves determined by 1 algorithm
+     * Plays a game with all the moves determined by 1 algorithm.
      */
     public void playGame() {
         Mark mark = Mark.XX;

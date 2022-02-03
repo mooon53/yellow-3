@@ -16,11 +16,4 @@ public class ComputerPlayer extends Player {
     public int[] turn(GameBoard board) {
         return strategy.determineMove(board, Mark.XX);
     }
-
-
-    //@pure;
-    public Strategy getStrategy() {
-        return strategy;
-    }
-
 }

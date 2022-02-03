@@ -94,7 +94,7 @@ public class BoardTest {
 
 
     @Test
-    public void testString(){
+    public void testString() {
         board.setField(29, Mark.XX);
         board.setField(19, Mark.XX);
         board.setField(5, Mark.OO);

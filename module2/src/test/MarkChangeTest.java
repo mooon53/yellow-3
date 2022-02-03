@@ -14,12 +14,12 @@ public class MarkChangeTest {
     private Mark mark;
 
     @BeforeEach
-    public void setup(){
+    public void setup() {
         mark = Mark.XX;
     }
 
     @Test
-    public void ifMarkChange(){
+    public void ifMarkChange() {
         assertEquals(Mark.OO, mark.other());
         mark = Mark.OO;
         assertEquals(Mark.XX, mark.other());

@@ -4,102 +4,87 @@ import src.Protocol;
 
 import java.io.*;
 import java.util.List;
-import java.util.concurrent.locks.Lock;
-import java.util.concurrent.locks.ReentrantLock;
 
 public class Logic extends Thread {
-    private GameServer server;
     private GameClient client;
     private BufferedReader reader;
-    private Lock lock = new ReentrantLock();
     private ClientHandler clientHandler;
 
     /**
-     * Constructor that takes input of clientHandler's socket
+     * Constructor that takes input of clientHandler's socket.
      *
-     * @param clientHandler
+     * @param ch the clientHandler that the Logic Thread will be bound to
      */
-    public Logic(ClientHandler clientHandler) {
-        this.clientHandler = clientHandler;
+    public Logic(ClientHandler ch) {
+        clientHandler = ch;
         try {
-            this.reader = new BufferedReader(new InputStreamReader(clientHandler.getSocket().getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(ch.getSocket().getInputStream()));
         } catch (IOException e) {
             System.out.println("Something went wrong while creating logic communicator.");
+            ch.shutDown();
         }
     }
 
     /**
-     * Constructor that takes input from client's socket
+     * Constructor that takes input from client's socket.
      *
-     * @param client
+     * @param client the Client that the Logic Thread will be bound to
      */
     public Logic(GameClient client) {
         this.client = client;
         try {
-            this.reader = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
+            reader = new BufferedReader(new InputStreamReader(client.getSocket().getInputStream()));
         } catch (IOException e) {
             System.out.println("Something went wrong while creating logic communicator.");
         }
     }
 
-
-    //@requires client!=null;
-    //@pure;
-    public GameClient getClient() {
-        return this.client;
-    }
-
-    public ClientHandler getClientHandler() {
-        return this.clientHandler;
-    }
-
-
-    public void receiveMessageFromClient(){
+    private void receiveMessageFromClient() {
         while (true) {
             String protocolMessage;
             try {
                 protocolMessage = reader.readLine();
                 System.out.println(protocolMessage);
             } catch (IOException e) {
-                this.clientHandler.shutDown();
+                clientHandler.shutDown();
                 break;
             }
             if (protocolMessage == null) {
-                this.clientHandler.shutDown();
+                clientHandler.shutDown();
                 break;
             }
             List<String> decode = Protocol.decodeProtocolMessage(protocolMessage);
             String command = decode.get(0);
             if (command != null) {
-                Protocol.CommandsIdentifier commandsIdentifier = Protocol.CommandsIdentifier.valueOf(command);
-                String com = null;
+                Protocol.CommandsIdentifier comId = Protocol.CommandsIdentifier.valueOf(command);
+                String com;
 
-                switch (commandsIdentifier) {
+                switch (comId) {
                     case LOGIN:
                         String name = decode.get(1);
-                        com = this.getClientHandler().getServer().loginClient(name);
+                        com = clientHandler.getServer().loginClient(name);
                         System.out.println(com);
-                        this.getClientHandler().sendMessage(com);
+                        clientHandler.sendMessage(com);
                         break;
                     case HELLO:
                         System.out.println(decode.get(1));
-                        com = this.getClientHandler().getServer().greeting();
-                        this.getClientHandler().getServer().getViewer().displayServerStatus();
-                        this.getClientHandler().sendMessage(com);
+                        com = clientHandler.getServer().greeting();
+                        clientHandler.getServer().getViewer().displayServerStatus();
+                        clientHandler.sendMessage(com);
                         break;
                     case LIST:
-                        com = (this.getClientHandler().getServer().sendList());
+                        com = clientHandler.getServer().sendList();
                         System.out.println(com);
-                        this.getClientHandler().sendMessage(com);
+                        clientHandler.sendMessage(com);
                         break;
                     case QUEUE:
-                        this.getClientHandler().getServer().addToQueue(this.clientHandler);
-                        this.getClientHandler().getServer().createGame();
+                        clientHandler.getServer().addToQueue(clientHandler);
+                        clientHandler.getServer().createGame();
                         break;
                     case MOVE:
                         int move = Integer.parseInt(decode.get(1));
                         int rotation = Integer.parseInt(decode.get(2));
-                        this.getClientHandler().getServer().makeMove(move, rotation, clientHandler);
+                        clientHandler.getServer().makeMove(move, rotation, clientHandler);
                         break;
                     case QUIT:
                         clientHandler.shutDown();
@@ -108,7 +93,7 @@ public class Logic extends Thread {
                         clientHandler.getServer().pong(clientHandler);
                         break;
                     case PONG:
-                        this.getClientHandler().getServer().ping();
+                        clientHandler.getServer().ping();
                         break;
                     default:
                         break;
@@ -119,7 +104,7 @@ public class Logic extends Thread {
         clientHandler.getServer().removeClient(clientHandler);
     }
 
-    public void receiveMessageFromServer() {
+    private void receiveMessageFromServer() {
         while (true) {
             String protocolMessage;
             try {
@@ -135,31 +120,32 @@ public class Logic extends Thread {
             List<String> decode = Protocol.decodeProtocolMessage(protocolMessage);
             String command = decode.get(0);
             if (command != null) {
-                Protocol.CommandsIdentifier commandsIdentifier = Protocol.CommandsIdentifier.valueOf(command);
+                Protocol.CommandsIdentifier comId = Protocol.CommandsIdentifier.valueOf(command);
                 //System.out.println(decode); //for testing purposes
-                switch (commandsIdentifier) {
+                switch (comId) {
                     case LOGIN:
-                        this.getClient().joinList();
+                        client.joinList();
                         break;
                     case HELLO:
-                        this.getClient().login();
+                        client.login();
                         break;
                     case ALREADYLOGGEDIN:
-                        this.getClient().getViewer().announce("It seems such username already taken. Please, choose another one.^^");
-                        this.getClient().setConnection();
+                        client.getViewer().announce("It seems such username already taken. " +
+                                "Please, choose another one.^^");
+                        client.setConnection();
                         break;
                     case LIST:
-                        this.getClient().joinQueue();
+                        client.joinQueue();
                         break;
                     case NEWGAME:
-                        if(decode.get(1).equals(this.getClient().getUsername())){
-                            this.getClient().setupGame(0);
-                        } else if (decode.get(2).equals(this.getClient().getUsername())){
-                            this.getClient().setupGame(1);
+                        if (decode.get(1).equals(client.getUsername())) {
+                            client.setupGame(0);
+                        } else if (decode.get(2).equals(client.getUsername())) {
+                            client.setupGame(1);
                         }
                         break;
                     case MOVE:
-                        this.getClient().move(Integer.parseInt(decode.get(1)) , Integer.parseInt(decode.get(2)));
+                        client.move(Integer.parseInt(decode.get(1)), Integer.parseInt(decode.get(2)));
                         break;
                     case GAMEOVER:
                         String reason = decode.get(1);
@@ -170,13 +156,13 @@ public class Logic extends Thread {
                         }
                         break;
                     case QUIT:
-                        this.getClient().quit();
+                        client.quit();
                         break;
                     case PING:
-                        this.getClient().pong();
+                        client.pong();
                         break;
                     case PONG:
-                        this.getClient().ping();
+                        client.ping();
                         break;
                     default:
                         break;
@@ -188,10 +174,10 @@ public class Logic extends Thread {
     }
 
     public void run() {
-        if (this.client != null) {
+        if (client != null) {
             this.receiveMessageFromServer();
         }
-        if (this.clientHandler != null) {
+        if (clientHandler != null) {
             this.receiveMessageFromClient();
         }
 
