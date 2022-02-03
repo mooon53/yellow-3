@@ -121,6 +121,7 @@ public class Logic extends Thread {
                 protocolMessage = reader.readLine();
             } catch (IOException e) {
                 System.out.println("Server connection lost :(");
+                client.close();
                 break;
             }
             if (protocolMessage == null) {
