@@ -49,6 +49,7 @@ public class GameClient extends Thread {
 
     /**
      * Returns the socket the client is connected to
+     *
      * @return socket
      */
     //@pure;
@@ -58,6 +59,7 @@ public class GameClient extends Thread {
 
     /**
      * Returns the viewer of the client
+     *
      * @return viewer
      */
     //@pure;
@@ -67,6 +69,7 @@ public class GameClient extends Thread {
 
     /**
      * Returns the username of the player using the client
+     *
      * @return username
      */
     //@pure;
@@ -76,6 +79,7 @@ public class GameClient extends Thread {
 
     /**
      * Returns the current board state in a String, so it can be shown to the user
+     *
      * @return current board state
      */
     //@pure;
@@ -107,6 +111,7 @@ public class GameClient extends Thread {
     /**
      * Creates a game.
      * Resets the board and creates a new Player
+     *
      * @param currentPlay 0 if this client has first turn, 1 otherwise
      */
     public synchronized void setupGame(int currentPlay) {
@@ -145,7 +150,8 @@ public class GameClient extends Thread {
 
     /**
      * Plays the move that the server sends on the board of the client.
-     * @param move index of the field
+     *
+     * @param move     index of the field
      * @param rotation integer of rotation
      */
     public synchronized void move(int move, int rotation) {
@@ -171,6 +177,7 @@ public class GameClient extends Thread {
 
     /**
      * Sends a HELLO command to the server.
+     *
      * @param name username to greet with.
      */
     public synchronized void greeting(String name) {
@@ -254,7 +261,7 @@ public class GameClient extends Thread {
     public void close() {
         writer.close();
     }
-
+}
 
 
 
