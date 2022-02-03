@@ -18,11 +18,17 @@ public class ComputerTest {
     private GameBoard board;
     private Strategy strategy;
 
+    /**
+     * Creates a new board
+     */
     @BeforeEach
     public void setUp() {
         board = new GameBoard();
     }
 
+    /**
+     * Plays a game with random moves.
+     */
     @Disabled
     @Test
     public void testRandomGame() {
@@ -30,6 +36,9 @@ public class ComputerTest {
         playGame();
     }
 
+    /**
+     * Plays a game BasicStrategy determining all the moves.
+     */
     @Disabled
     @Test
     public void testBasicStrategy() {
@@ -37,6 +46,9 @@ public class ComputerTest {
         playGame();
     }
 
+    /**
+     * Plays a game with SmartStrategy determining all the moves.
+     */
     @Disabled
     @Test
     public void testSmartStrategy() {
@@ -66,7 +78,9 @@ public class ComputerTest {
     }
 
 
-
+    /**
+     * Tests if SmartStrategy behaves as expected.
+     */
     @Test
     public void testSmartWinningMove() {
         strategy = new SmartStrategy();

@@ -1,5 +1,8 @@
 package src.game;
 
+/**
+ * Board to play Pentago games on.
+ */
 public class GameBoard extends AbstractBoard {
     //@public invariant fields.length == DIM*DIM;
     //@public invariant (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] != null);
@@ -30,6 +33,7 @@ public class GameBoard extends AbstractBoard {
 
     /**
      * Constructor: creates a new Board where all fields are empty.
+     * Also creates the 4 subBoards that the board is made of
      */
     //@ ensures (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY);
     public GameBoard() {
@@ -65,6 +69,8 @@ public class GameBoard extends AbstractBoard {
      * @param i the index of the field to be changed.
      * @param mark the mark the field needs to be set to.
      */
+    //@requires mark != null;
+    //@ensures getField(i) != Mark.EMPTY;
     @Override
     public void setField(int i, Mark mark) {
         int index = getSubBoard(i);
@@ -118,11 +124,11 @@ public class GameBoard extends AbstractBoard {
 
     /**
      * Updates the board so that the fields match the subBoard of the given index.
-     * To be used in rotateRight and rotateLeft.
+     * To be used in rotateRight and rotateLeft
      * @param index the index of the subBoard
      */
     //@requires index >= 0 && index < 4;
-    public void updateBoard(int index) {
+    private void updateBoard(int index) {
         int row = DIM / 2;
         int col = DIM / 2;
         if (index % 2 == 0) {
@@ -138,12 +144,24 @@ public class GameBoard extends AbstractBoard {
         }
     }
 
+    /**
+     * Resets the gameBoard.
+     * Sets all the fields to Mark.EMPTY:
+     */
+    //@ ensures (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] == Mark.EMPTY);
     public void reset() {
         for (int i = 0; i < DIM * DIM; i++) {
             setField(i, Mark.EMPTY);
         }
     }
 
+
+    /**
+     * Checks whether the board is full.
+     * @return true if all fields are not empty, false otherwise
+     */
+    //@ ensures (\forall int i; (i >= 0 && i < DIM*DIM); fields[i] != Mark.EMPTY) ==> \result;
+    //@ ensures !(\forall int i; (i >= 0 && i < DIM*DIM); fields[i] != Mark.EMPTY) ==> !\result;
     public boolean isFull() {
         boolean result = true;
         for (int i = 0; i < DIM * DIM; i++) {
@@ -153,12 +171,13 @@ public class GameBoard extends AbstractBoard {
         }
         return result;
     }
+
     /**
-     * Check whether a given mark covers a line by winning conditions.
+     * Checks whether a given mark covers a line by winning conditions.
      * @param mark represents a mark to check
-     * @return true if there are 5 marks in a row
+     * @return true if there are 5 marks in a row, false otherwise
      */
-    //@requires mark != Mark.EMPTY;
+    //@requires mark != Mark.EMPTY && mark != null;
     public boolean winLine(Mark mark) {
         boolean result = false;
         int counter;
@@ -181,10 +200,11 @@ public class GameBoard extends AbstractBoard {
     }
 
     /**
-     * Check whether a given mark covers a column by winning conditions.
-     *@param mark represents a mark to check
-     *@return true if there are 5 marks in a column
+     * Checks whether a given mark covers a column by winning conditions.
+     * @param mark represents a mark to check
+     * @return true if there are 5 marks in a column, false otherwise
      */
+    //@requires mark != Mark.EMPTY && mark != null;
     public boolean winCol(Mark mark) {
         boolean result = false;
         int counter;
@@ -206,6 +226,12 @@ public class GameBoard extends AbstractBoard {
         return result;
     }
 
+    /**
+     * Checks whether the given mark covers one of the main diagonals (with 6 fields).
+     * @param mark represents a mark to check
+     * @return true if there are 5 marks in one of the main diagonals, false otherwise
+     */
+    //@requires mark != Mark.EMPTY && mark != null;
     public boolean winDiagonal(Mark mark) {
         int counter1 = 0;
         int counter2 = 0;
@@ -227,6 +253,13 @@ public class GameBoard extends AbstractBoard {
 
     }
 
+
+    /**
+     * Checks whether the given mark covers one of the other diagonals (with 5 fields).
+     * @param mark represents a mark to check
+     * @return true if there are 5 marks in one of the other diagonals, false otherwise
+     */
+    //@requires mark != Mark.EMPTY && mark != null;
     public boolean winIrregularDiagonal(Mark mark) {
         int counter1 = 0;
         int counter2 = 0;
@@ -283,7 +316,7 @@ public class GameBoard extends AbstractBoard {
      * @param mark represents the mark of player
      * @return true if one of players is a winner in either direction
      */
-    //@requires !mark.equals(Mark.EMPTY);
+    //@requires mark != Mark.EMPTY && mark != null;
     public boolean isWinner(Mark mark) {
         return winLine(mark) || winCol(mark) || winDiagonal(mark) || winIrregularDiagonal(mark);
     }

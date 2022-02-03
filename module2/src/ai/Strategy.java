@@ -3,6 +3,9 @@ package src.ai;
 import src.game.Board;
 import src.game.Mark;
 
+/**
+ * Default interface that every AI should implement. Is used by ComputerPlayer.
+ */
 public interface Strategy {
 
     /**

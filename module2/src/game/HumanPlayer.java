@@ -4,15 +4,29 @@ import src.ai.DumbStrategy;
 
 import java.util.Scanner;
 
+/**
+ * Player class that plays legal moves according to the user input.
+ * Needs to be used if a user wants to play the game themselves.
+ */
 public class HumanPlayer extends Player {
     private final DumbStrategy random;
 
+    /**
+     * Constructor: create a HumanPlayer with given username and mark
+     * @param name username of the player
+     * @param mark mark of the player
+     */
     public HumanPlayer(String name, Mark mark) {
         super(name, mark);
         random = new DumbStrategy();
     }
 
-
+    /**
+     * Asks the user for input to play a move with a scanner.
+     * Can also give an example legal move to the user.
+     * @param board current board state
+     * @return the move that the player wants to play
+     */
     @Override
     public int[] turn(GameBoard board) {
         int[] result = new int[2];
@@ -21,6 +35,8 @@ public class HumanPlayer extends Player {
                 "Enter the index of a field, or enter HINT for an example move";
         System.out.println(prompt);
         String input = scanner.nextLine();
+
+        //generate a random move and print it
         if (input.equalsIgnoreCase("hint")) {
             int[] example = random.determineMove(board, getMark());
             String rotation;
@@ -35,6 +51,8 @@ public class HumanPlayer extends Player {
         } else {
             result[0] = Integer.parseInt(input);
         }
+
+        //see if the move is valid
         boolean free = result[0] >= 0 && result[0] < 36 && board.getField(result[0]) == Mark.EMPTY;
         while (!free) {
             System.out.println("Unacceptable input. Try again: ");

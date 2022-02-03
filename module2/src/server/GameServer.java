@@ -9,6 +9,9 @@ import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
 
+/**
+ * The server which Pentago runs on.
+ */
 public class GameServer extends Thread {
     private ArrayList<ClientHandler> clientHandlers;
     private ServerSocket serverSocket;
@@ -17,7 +20,10 @@ public class GameServer extends Thread {
     private ArrayList<ClientHandler> queue;
     private ArrayList<String> loggedPlayers;
 
-
+    /**
+     * Constructor: starts a new Server on the given port
+     * @param port port to start the server on
+     */
     public GameServer(int port) {
         try {
             boards = new ArrayList<>();
@@ -25,7 +31,7 @@ public class GameServer extends Thread {
             clientHandlers = new ArrayList<>();
             queue = new ArrayList<>();
             setViewer();
-            System.out.println("_____Pentago Server_____");
+            viewer.announce("_____Pentago Server_____");
             serverSocket = new ServerSocket(port);
             viewer.announce("Connected to port: " + serverSocket.getLocalPort());
             viewer.displayServerStatus();
@@ -36,25 +42,43 @@ public class GameServer extends Thread {
     }
 
     //getters
+
+
+    /**
+     * Returns a list of all connected clientHandlers
+     * @return ArrayList of clientHandlers
+     */
     //@requires clientHandlers.size()!=0;
     //@pure;
     public ArrayList<ClientHandler> getClientHandlers() {
         return this.clientHandlers;
     }
 
-
+    /**
+     * Returns the connected viewer
+     * @return viewer
+     */
     //@pure;
     public ServerViewer getViewer() {
         return viewer;
     }
 
-
-    public void addClientHandler(ClientHandler clientHandler) {
+    /**
+     * Adds a clientHandler to the list.
+     * Also displays the status of the server
+     * @param clientHandler the clientHandler to add to the list
+     */
+    private void addClientHandler(ClientHandler clientHandler) {
         clientHandlers.add(clientHandler);
         viewer.displayServerStatus();
     }
 
-
+    /**
+     * Removes a clientHandler from the list.
+     * Also removes it from the queue
+     * If the clientHandler was in a game, it informs the other clientHandler in that game.
+     * @param clientHandler the clientHandler that disconnected
+     */
     public void removeClient(ClientHandler clientHandler) {
         clientHandlers.remove(clientHandler);
         queue.remove(clientHandler);
@@ -73,12 +97,19 @@ public class GameServer extends Thread {
     }
 
 
-
+    /**
+     * Creates a new viewer for the server.
+     */
     private void setViewer() {
         viewer = new ServerViewer(this);
         new Thread(viewer).start();
     }
 
+    /**
+     * Response to a LOGIN command of a client.
+     * @param username the username of the client
+     * @return the command that needs to be sent in response
+     */
     public synchronized String loginClient(String username) {
         String command;
         if (availableUsername(username)) {
@@ -91,6 +122,12 @@ public class GameServer extends Thread {
         return command;
     }
 
+
+    /**
+     * Adds the given clientHandler to the queue.
+     * Response to the QUEUE command
+     * @param clientHandler to add to the queue
+     */
     public synchronized void addToQueue(ClientHandler clientHandler) {
         int state = queue.size();
         if (state == 0) {
@@ -101,6 +138,11 @@ public class GameServer extends Thread {
         }
     }
 
+    /**
+     * Creates a new game if the queue consists of 2 clients.
+     * Sends NEWGAME command to the clients in the queue
+     * Also removes those clients from the queue
+     */
     public void createGame() {
         if (queue.size() == 2) {
             GameBoard board = new GameBoard();
@@ -117,6 +159,14 @@ public class GameServer extends Thread {
         }
     }
 
+    /**
+     * Response to a MOVE command.
+     * Checks if the move is legal
+     * If it is, it plays it and sends it to the clientHandlers in that game
+     * @param index the field to place a piece on
+     * @param rotation the rotation sent
+     * @param user the clientHandler that sent the move
+     */
     public void makeMove(int index, int rotation, ClientHandler user) {
         GameBoard board = user.getBoard();
         ClientHandler opponent = null;
@@ -150,7 +200,7 @@ public class GameServer extends Thread {
         }
         user.sendMessage(Protocol.move(index, rotation));
         opponent.sendMessage(Protocol.move(index, rotation));
-        System.out.println(board); //for testing purposes
+
         //the move is done, now we check if the game has ended
         if (board.isFull() || board.isWinner(Mark.XX) || board.isWinner(Mark.OO)) {
             String gameOver;
@@ -172,12 +222,20 @@ public class GameServer extends Thread {
         }
     }
 
+    /**
+     * Response to a HELLO command
+     * @return a HELLO command to be sent to the client
+     */
     public synchronized String greeting() {
         return Protocol.greeting("PentagoServer of Katy and Niels :)");
     }
 
-
-    public boolean availableUsername(String username) {
+    /**
+     * Checks if there exists no client with the given username
+     * @param username the name to be checked
+     * @return false if there exists a client with that username, true otherwise
+     */
+    private boolean availableUsername(String username) {
         boolean is = true;
         for (String player : this.loggedPlayers) {
             if (player != null && !player.equals("") && player.equals(username)) {
@@ -188,21 +246,35 @@ public class GameServer extends Thread {
         return is;
     }
 
+    /**
+     * Response to LIST command
+     * @return a LIST command to be sent to the client
+     */
     public synchronized String sendList() {
         String command = Protocol.list(loggedPlayers);
         viewer.displayServerStatus();
         return command;
     }
 
+    /**
+     * Response to PONG command
+     */
     public void ping() {
-        System.out.println("PONG");
+        viewer.announce("PONG");
     }
 
+    /**
+     * Response to PING command
+     * @param ch the clientHandler sending the PING command
+     */
     public void pong(ClientHandler ch) {
         ch.sendMessage(Protocol.pong());
     }
 
-
+    /**
+     * Returns a list of the boards currently in play
+     * @return boards
+     */
     public ArrayList<GameBoard> getBoards() {
         return boards;
     }

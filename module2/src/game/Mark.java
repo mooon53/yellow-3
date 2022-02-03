@@ -1,5 +1,8 @@
 package src.game;
 
+/**
+ * An enum that determines the different values a field of a board can have.
+ */
 public enum Mark {
 
     EMPTY, XX, OO;

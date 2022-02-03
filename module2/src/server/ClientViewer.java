@@ -5,24 +5,45 @@ import java.net.InetAddress;
 import java.net.UnknownHostException;
 import java.util.Scanner;
 
+/**
+ * Viewer class of a client.
+ * Has methods to print stuff to the user and ask the user for input
+ */
 public class ClientViewer extends Thread {
     private GameClient client;
     private Scanner scanner = new Scanner(System.in);
 
+    /**
+     * Constructor: create a new ClientViewer bound to the given GameClient.
+     * @param client the GameClient which it should be bound to.
+     */
+    //@requires client != null;
     public ClientViewer(GameClient client) {
         this.client = client;
     }
 
-    //methods
+    /**
+     * Asks the user to choose a username.
+     * @return the input that the user enters
+     */
     public synchronized String getClientName() {
         System.out.println("Username: ");
         return scanner.next();
     }
 
+    /**
+     * Asks the user to choose a port to connect to.
+     * @return the integer that the user enters
+     */
     public int getPort() {
         System.out.println("Join port: ");
         return scanner.nextInt();
     }
+
+    /**
+     * Asks the user to choose an IP to connect to.
+     * @return the InetAddress the user wants to connect to
+     */
     public InetAddress getInetAddress() {
         InetAddress inetAddress;
         System.out.println("Join host: ");
@@ -40,6 +61,10 @@ public class ClientViewer extends Thread {
         return inetAddress;
     }
 
+    /**
+     * Asks the user if they want to play themselves, or let an AI play.
+     * @return the integer corresponding to the choice the user made
+     */
     public int level() {
         int level;
         while (true) {
@@ -54,15 +79,26 @@ public class ClientViewer extends Thread {
 
     }
 
+    /**
+     * Displays the current board state.
+     */
     public void displayCurrentBoard() {
         System.out.println(client.getCurrentBoard());
     }
 
+    /**
+     * Prints a String to the user
+     * @param msg String that should be printed
+     */
     public void announce(String msg) {
         System.out.println(msg);
     }
 
-
+    /**
+     * Tells the player the game has ended.
+     * @param reason why the game ended
+     * @param won if the player has won the game
+     */
     public void endGame(String reason, boolean won) {
         displayCurrentBoard();
         if (reason.equals("DRAW")) {
@@ -75,4 +111,18 @@ public class ClientViewer extends Thread {
         client.joinQueue();
     }
 
+    /**
+     * Asks the player if they want to join the queue, or quit the program
+     * @return 0 if user wants to queue, 1 if user wants to quit
+     */
+    public int queue() {
+        int choice;
+        System.out.println("Play a game? 0-yes 1-no");
+        choice = scanner.nextInt();
+        while (choice != 0 && choice != 1) {
+            System.out.println("Play a game? 0-yes 1-no");
+            choice = scanner.nextInt();
+        }
+        return choice;
+    }
 }

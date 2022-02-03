@@ -4,19 +4,34 @@ import src.game.Board;
 import src.game.GameBoard;
 import src.game.Mark;
 
+/**
+ * A strategy that prevents the opponent from winning by blocking a guaranteed win for the opponent in 2 moves
+ * Can also see win opportunities 2 moves ahead
+ * Not very easy to beat
+ */
 public class SmartStrategy implements Strategy {
-    //prevents the opponent from winning by blocking a guaranteed win for the opponent in 2 moves
-    //can also see win opportunities 2 moves ahead
-    //should be better in seeing patterns than the average player
+
     private DumbStrategy random = new DumbStrategy();
     private BasicStrategy basic = new BasicStrategy();
 
+    /**
+     * The name (difficulty) of the strategy
+     * @return the name of the strategy
+     */
     @Override
     public String getName() {
         return "Hard";
     }
 
-
+    /**
+     * Tries to find a guaranteed win (in 2 moves or fewer).
+     * Checks for every move if the selected mark can win
+     * The opponent plays the move according to BasicStrategy
+     * If we still have a winning move after that, we have a guaranteed win
+     * @param board current board state
+     * @param mark the mark to determine a winning move of
+     * @return the winning move, or null if no such move exists
+     */
     public int[] determineWinningMove(Board board, Mark mark) {
         //see if we can win immediately
         int[] move = basic.determineWinningMove(board, mark);
@@ -52,7 +67,15 @@ public class SmartStrategy implements Strategy {
         return null; //return null if no move wins
     }
 
-
+    /**
+     * Determines the move for the player.
+     * First checks if there is a guaranteed win for the player
+     * If there is no such move, it returns a move such that the opponent doesn't have a guaranteed win in 2 moves
+     * If no such move exists, it returns a random move
+     * @param board the current board state
+     * @param mark the mark that the player uses
+     * @return the move to be played
+     */
     @Override
     public int[] determineMove(Board board, Mark mark) {
         int[] move = determineWinningMove(board, mark);

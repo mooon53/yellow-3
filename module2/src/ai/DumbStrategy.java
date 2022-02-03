@@ -5,13 +5,27 @@ import src.game.Board;
 import src.game.GameBoard;
 import src.game.Mark;
 
+/**
+ * A strategy that just select random legal moves
+ */
 public class DumbStrategy implements Strategy {
-    //A strategy that selects random moves
+
+    /**
+     * The name (difficulty) of the strategy
+     * @return the name of the strategy
+     */
     @Override
     public String getName() {
         return "Easy";
     }
 
+    /**
+     * Gets all the indexes of empty fields, and select a random one.
+     * Also selects a random rotation.
+     * @param board the current board state
+     * @param mark the mark that the player uses
+     * @return a random legal move
+     */
     @Override
     public int[] determineMove(Board board, Mark mark) {
         int[] moveList = new int[GameBoard.DIM * GameBoard.DIM];

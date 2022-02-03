@@ -1,9 +1,16 @@
 package src.game;
 
+/**
+ * Abstract class that implements the Board interface.
+ * Implements the shared methods of GameBoard and SubBoard
+ */
 public abstract class AbstractBoard implements Board{
     public final int dim;
     protected Mark[] fields;
 
+    /**
+     * Constructor: sets all the fields to empty mark.
+     */
     public AbstractBoard(int dim) {
         this.dim = dim;
         fields = new Mark[dim*dim];
@@ -12,6 +19,12 @@ public abstract class AbstractBoard implements Board{
         }
     }
 
+    /**
+     * Returns the index of the given row and column of the board.
+     * @param row row of the field requested
+     * @param col column of the field requested
+     * @return index of the field
+     */
     //@requires row < dim && row >= 0;
     //@requires col < dim && col >= 0;
     //@pure;
@@ -31,6 +44,13 @@ public abstract class AbstractBoard implements Board{
         return fields[i];
     }
 
+
+    /**
+     * Returns the Mark of the field in given row and column.
+     * @param row row of the field requested
+     * @param col column of the field requested
+     * @return mark of the field requested
+     */
     //@requires isField(getIndex(row, col));
     //@pure;
     public Mark getField(int row, int col) {
@@ -39,7 +59,8 @@ public abstract class AbstractBoard implements Board{
 
 
     /**
-     * @return true if i is a valid index of fields, true if it's not.
+     * Checks if given index is a field of the board.
+     * @return true if i is a valid index of fields, false otherwise
      */
     //@ensures i < fields.length && i >= 0 ==> \result == true;
     //@pure;

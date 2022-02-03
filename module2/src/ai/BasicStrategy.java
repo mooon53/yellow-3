@@ -13,11 +13,22 @@ public class BasicStrategy implements Strategy {
 
     private DumbStrategy random = new DumbStrategy();
 
+
+    /**
+     * The name (difficulty) of the strategy.
+     * @return the name of the strategy
+     */
     @Override
     public String getName() {
         return "Normal";
     }
 
+    /**
+     * Checks if, for every legal move, it makes the selected mark the winner.
+     * @param board current board state
+     * @param mark mark to be checked if it can win the game
+     * @return a winning move, or null if no such move exists
+     */
     public int[] determineWinningMove(Board board, Mark mark) {
         for (int i = 0; board.isField(i); i++) {
             for (int j = 0; j < 8; j++) {
@@ -38,7 +49,15 @@ public class BasicStrategy implements Strategy {
         return null; //if no move wins, return null
     }
 
-
+    /**
+     * Determines the move for the player.
+     * First checks if there is a move that directly wins them the game
+     * If there is no such move, it returns a move such that the opponent cannot win the game in 1 move
+     * If no such move exists, it returns a random move
+     * @param board the current board state
+     * @param mark the mark that the player uses
+     * @return the move to be played
+     */
     @Override
     public int[] determineMove(Board board, Mark mark) {
         //try to find a winning move first

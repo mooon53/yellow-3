@@ -5,6 +5,10 @@ import src.Protocol;
 import java.io.*;
 import java.util.List;
 
+/**
+ * Class that implements the Protocol.
+ * Client and clientHandlers use it to process incoming commands
+ */
 public class Logic extends Thread {
     private GameClient client;
     private BufferedReader reader;
@@ -12,7 +16,6 @@ public class Logic extends Thread {
 
     /**
      * Constructor that takes input of clientHandler's socket.
-     *
      * @param ch the clientHandler that the Logic Thread will be bound to
      */
     public Logic(ClientHandler ch) {
@@ -27,7 +30,6 @@ public class Logic extends Thread {
 
     /**
      * Constructor that takes input from client's socket.
-     *
      * @param client the Client that the Logic Thread will be bound to
      */
     public Logic(GameClient client) {
@@ -39,6 +41,10 @@ public class Logic extends Thread {
         }
     }
 
+    /**
+     * Processes commands sent by the connected client.
+     * To be used by a clientHandler to process commands
+     */
     private void receiveMessageFromClient() {
         while (true) {
             String protocolMessage;
@@ -104,6 +110,10 @@ public class Logic extends Thread {
         clientHandler.getServer().removeClient(clientHandler);
     }
 
+    /**
+     * Processes commands sent by the connected server.
+     * To be used by a client to process commands
+     */
     private void receiveMessageFromServer() {
         while (true) {
             String protocolMessage;
@@ -121,7 +131,6 @@ public class Logic extends Thread {
             String command = decode.get(0);
             if (command != null) {
                 Protocol.CommandsIdentifier comId = Protocol.CommandsIdentifier.valueOf(command);
-                //System.out.println(decode); //for testing purposes
                 switch (comId) {
                     case LOGIN:
                         client.joinList();
@@ -175,10 +184,10 @@ public class Logic extends Thread {
 
     public void run() {
         if (client != null) {
-            this.receiveMessageFromServer();
+            receiveMessageFromServer();
         }
         if (clientHandler != null) {
-            this.receiveMessageFromClient();
+            receiveMessageFromClient();
         }
 
         try {

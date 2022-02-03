@@ -2,13 +2,20 @@ package src.game;
 
 public class SubBoard extends AbstractBoard {
 
+    /**
+     * Constructor: creates a subBoard with given dimension
+     * @param dim dimension of the subBoard
+     */
     public SubBoard(int dim) {
         super(dim);
     }
 
 
-
-
+    /**
+     * Creates a deepCopy of this subBoard.
+     * @return a different subBoard with the same exact fields
+     */
+    //@ ensures \result != this;
     @Override
     public SubBoard deepCopy() {
         SubBoard copyBoard = new SubBoard(dim);

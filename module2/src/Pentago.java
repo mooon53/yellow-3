@@ -5,11 +5,17 @@ import src.server.GameClient;
 import src.server.GameServer;
 import java.util.Scanner;
 
-
+/**
+ * The main class of the entire project.
+ * Starts a GameServer or GameClient
+ */
 public class Pentago {
     static Scanner scanner = new Scanner(System.in);
 
-    public static void startServer() {
+    /**
+     * Starts a new GameServer.
+     */
+    private static void startServer() {
         Scanner sc = new Scanner(System.in);
         System.out.print("Choose port: ");
         int port = sc.nextInt();
@@ -18,7 +24,10 @@ public class Pentago {
         s.start();
     }
 
-    public static void startClient() {
+    /**
+     * Starts a new GameClient.
+     */
+    private static void startClient() {
         GameClient client = new GameClient();
         Thread c = new Thread(client);
         c.start();
