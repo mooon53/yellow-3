@@ -7,8 +7,8 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
-import src.game.GameBoard;
-import src.game.Mark;
+import src.model.game.GameBoard;
+import src.model.game.Mark;
 
 /**
  * Test class to test most board methods.

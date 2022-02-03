@@ -2,7 +2,7 @@ package src.test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import src.game.*;
+import src.model.game.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 

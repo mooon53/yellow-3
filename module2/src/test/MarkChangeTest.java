@@ -4,7 +4,7 @@ package src.test;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import src.game.Mark;
+import src.model.game.Mark;
 
 
 import static org.junit.jupiter.api.Assertions.assertEquals;

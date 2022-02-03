@@ -4,9 +4,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Disabled;
 
-import src.ai.*;
-import src.game.GameBoard;
-import src.game.Mark;
+import src.model.ai.*;
+import src.model.game.GameBoard;
+import src.model.game.Mark;
 
 import static org.junit.jupiter.api.Assertions.*;
 
