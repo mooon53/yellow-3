@@ -1,25 +1,19 @@
 package src;
 
-import src.game.Mark;
 
 import java.util.*;
 
+/**
+ * The Protocol that both the server and the client need to follow.
+ */
 public class Protocol {
     /**
-     * board dimension
-     */
-    public static final int[] DIMS = {6, 6};
-    /**
-     * argument separator
+     * argument separator.
      */
     public static final String AS = "~";
-    /**
-     * command separator
-     */
-    public static final String CS = "\n";
 
     /**
-     * CommandsIdentifiers to save meaning of commands
+     * CommandsIdentifiers to save meaning of commands.
      */
     public enum CommandsIdentifier {
         HELLO, //greeting
@@ -33,112 +27,157 @@ public class Protocol {
         PONG, //receive
         QUIT, //disconnect
         ERROR, //the command is triggered by error
-        QUEUE; //waiting queue of players
+        QUEUE //waiting queue of players
     }
 
 
 
     /**
-     * Transform received string to protocol format
+     * Transform received string to protocol format.
      *
-     * @param Pstring protocol format string
-     * @return
+     * @param string protocol format string
+     * @return list of strings, created by splitting the original string with ~
      */
-    public static List<String> decodeProtocolMessage(String Pstring) {
-        List<String> list = Arrays.asList(Pstring.split(AS));
-        return list;
+    public static List<String> decodeProtocolMessage(String string) {
+        return Arrays.asList(string.split(AS));
     }
 
 
-    public static String[] parseCommands(String line){
-        return line.strip().split(CS);
+    /**
+     * Encodes the text to send as HELLO command.
+     * @param text to encode
+     * @return encoded HELLO command
+     */
+    public static String greeting(String text) {
+        return "HELLO" + AS + text;
     }
 
-    public static String[] parseArr(String line) {
-        return line.strip().split(AS);
+    /**
+     * Encodes the message to send as ERROR command.
+     * @param message to encode
+     * @return encoded ERROR command
+     */
+    public static String error(String message) {
+        return "ERROR~" + message;
     }
 
-    public static String encodeArray(String[] array){
-        StringBuilder stringBuilder = new StringBuilder();
-
-        for(int i = 0; i< array.length; i++){
-            stringBuilder.append(array[i]);
-            if (i != array.length-1){
-                stringBuilder.append(AS);
-            }
-        }
-        stringBuilder.append(CS);
-        return stringBuilder.toString();
-    }
-
-
-
-    public static String greeting(String text){
-        //System.out.println("HELLO"+AS+text);
-        return "HELLO"+AS+text;
-    }
-
-
-    public static String error (String message){
-        return "ERROR~"+message;
-    }
-
-    public static String error(){
+    /**
+     * Encodes an ERROR command.
+     * @return encoded ERROR command
+     */
+    public static String error() {
         return "ERROR";
     }
 
-    //----------------------------------------------------
-    public static String newGame(String player1, String player2){
-        return "NEWGAME~"+player1+"~"+player2;
+    /**
+     * Encodes a NEWGAME command.
+     * @param player1 player that has the first turn
+     * @param player2 second player
+     * @return encoded NEWGAME command
+     */
+    public static String newGame(String player1, String player2) {
+        return "NEWGAME~" + player1 + "~" + player2;
     }
-    public static String login(String username){
-        return "LOGIN~"+username;
+
+    /**
+     * Encodes a LOGIN command.
+     * @param username to login with
+     * @return encoded LOGIN command.
+     */
+    public static String login(String username) {
+        return "LOGIN~" + username;
     }
-    public static String login(){
+
+    /**
+     * Encodes a LOGIN command.
+     * @return encoded LOGIN command.
+     */
+    public static String login() {
         return "LOGIN";
     }
-    public static String move(int index, int rotation){
-        return "MOVE~"+index+AS+rotation;
+
+    /**
+     * Encodes a MOVE command.
+     * @param index the field of the move
+     * @param rotation the rotation of the move
+     * @return encoded MOVE command
+     */
+    public static String move(int index, int rotation) {
+        return "MOVE~" + index + AS + rotation;
     }
-    public static String gameover(String reason, String username){
+
+    /**
+     * Encodes a GAMEOVER command.
+     * @param reason the reason that the game is finished
+     * @param username the winner of the game
+     * @return encoded GAMEOVER command
+     */
+    public static String gameover(String reason, String username) {
         if (reason.equals("DRAW")) {
             return "GAMEOVER" + AS + "DRAW";
         } else {
             return "GAMEOVER" + AS + reason + AS + username;
         }
     }
-    public static String list(ArrayList<String> names){
+
+    /**
+     * Encodes a LIST command.
+     * @param names the list that needs to be sent
+     * @return encoded LIST command
+     */
+    public static String list(ArrayList<String> names) {
         String res = "LIST";
-        for(String name : names){
-            res+=(AS+name);
+        for (String name : names) {
+            res += AS + name;
         }
         return res;
     }
 
-    public static String list(){
+    /**
+     * Encodes a LIST command.
+     * @return encoded LIST command.
+     */
+    public static String list() {
         return "LIST";
     }
 
-    public static String queue(){
+    /**
+     * Encodes a QUEUE command.
+     * @return encoded QUEUE command
+     */
+    public static String queue() {
         return "QUEUE";
     }
-    public static String queue(String username){
-        return "QUEUE"+AS+username;
-    }
 
-    public static String alreadyLoggedIn(){
+    /**
+     * Encodes an ALREADYLOGGEDIN command.
+     * @return encoded ALREADYLOGGEDIN command
+     */
+    public static String alreadyLoggedIn() {
         return "ALREADYLOGGEDIN";
     }
 
-    public static String quit(){
+    /**
+     * Encodes a QUIT command.
+     * @return encoded QUIT command
+     */
+    public static String quit() {
         return "QUIT";
     }
 
-    public static String ping(){
+    /**
+     * Encodes a PING command.
+     * @return encoded PING command
+     */
+    public static String ping() {
         return "PING";
     }
 
-    public static String pong(){
+    /**
+     * Encodes a PONG command.
+     * @return encoded PONG command
+     */
+    public static String pong() {
         return "PONG";
     }
 

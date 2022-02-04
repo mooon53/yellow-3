@@ -7,18 +7,27 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.BeforeEach;
 
-import src.game.GameBoard;
-import src.game.Mark;
+import src.model.game.GameBoard;
+import src.model.game.Mark;
 
-
+/**
+ * Test class to test most board methods.
+ * Does not test the win-conditions
+ */
 public class BoardTest {
     private GameBoard board;
 
+    /**
+     * Creates a new board
+     */
     @BeforeEach
     public void setUp() {
         board = new GameBoard();
     }
 
+    /**
+     * Tests getIndex()
+     */
     @Test
     public void testIndex() {
         int index = 0;
@@ -28,11 +37,11 @@ public class BoardTest {
                 index += 1;
             }
         }
-//        assertEquals(1, board.index(0, 1));
-//        assertEquals(3, board.index(1, 0));
-//        assertEquals(8, board.index(2, 2));
     }
 
+    /**
+     * Tests if isField() works correctly
+     */
     @Test
     public void testIsFieldIndex() {
         assertFalse(board.isField(-1));
@@ -41,7 +50,9 @@ public class BoardTest {
         assertFalse(board.isField(GameBoard.DIM * GameBoard.DIM));
     }
 
-
+    /**
+     * Tests if setField and getField work correctly
+     */
     @Test
     public void testSetAndGetFieldIndex() {
         board.setField(0, Mark.XX);
@@ -53,7 +64,9 @@ public class BoardTest {
         assertEquals(Mark.XX, board.subBoards[0].getField(5));
     }
 
-
+    /**
+     * Tests if the board is created in the right way
+     */
     @Test
     public void testSetup() {
         for (int i = 0; i < GameBoard.DIM * GameBoard.DIM; i++) {
@@ -62,6 +75,9 @@ public class BoardTest {
         assertEquals(Mark.EMPTY, board.getField(GameBoard.DIM * GameBoard.DIM - 1));
     }
 
+    /**
+     * Tests if the different subBoards rotate correctly to the right.
+     */
     @Test
     public void testRotate() {
         board.setField(0, Mark.XX);
@@ -77,6 +93,9 @@ public class BoardTest {
         assertEquals(Mark.XX, board.getField(13));
     }
 
+    /**
+     * Tests if the different subBoards rotate correctly to the left.
+     */
     @Test
     public void testRotateLeft() {
         board.setField(29, Mark.XX);
@@ -92,9 +111,12 @@ public class BoardTest {
         assertEquals(Mark.XX, board.getField(24));
     }
 
-
+    /**
+     * Tests toString()
+     * Doesn't assert anything, but prints the board to check if it displays correctly
+     */
     @Test
-    public void testString(){
+    public void testString() {
         board.setField(29, Mark.XX);
         board.setField(19, Mark.XX);
         board.setField(5, Mark.OO);
