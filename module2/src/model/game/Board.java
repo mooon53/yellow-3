@@ -29,6 +29,7 @@ public interface Board {
 
     /**
      * Checks if given index is a field of the board.
+     * @param i index to be checked
      * @return true if i is a valid index of fields, false otherwise
      */
     boolean isField(int i);
@@ -43,6 +44,7 @@ public interface Board {
 
     /**
      * Creates a deep copy of this board.
+     * @return new board with the same exact fields
      */
     Board deepCopy();
 }

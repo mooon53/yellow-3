@@ -10,6 +10,7 @@ public abstract class AbstractBoard implements Board{
 
     /**
      * Constructor: sets all the fields to empty mark.
+     * @param dim dimension of the board
      */
     public AbstractBoard(int dim) {
         this.dim = dim;
