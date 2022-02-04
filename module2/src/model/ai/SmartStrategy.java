@@ -5,7 +5,8 @@ import src.model.game.GameBoard;
 import src.model.game.Mark;
 
 /**
- * A strategy that prevents the opponent from winning by blocking a guaranteed win for the opponent in 2 moves
+ * A strategy that thinks 2 moves ahead.
+ * It prevents the opponent from winning by blocking a guaranteed win for the opponent in 2 moves
  * Can also see win opportunities 2 moves ahead
  * Not very easy to beat
  */
@@ -50,7 +51,8 @@ public class SmartStrategy implements Strategy {
                     } else {
                         copy.rotateRight(j / 2);
                     }
-                    //this prevents us from winning, if it's possible
+                    //this wins the opponent the game, if possible
+                    //otherwise this tries to prevent us from winning
                     int[] basicMove = basic.determineMove(copy, mark.other());
                     copy.setField(basicMove[0], mark.other());
                     if (basicMove[1] % 2 == 0) {
@@ -58,7 +60,7 @@ public class SmartStrategy implements Strategy {
                     } else {
                         copy.rotateRight(basicMove[1] / 2);
                     }
-                    if (basic.determineWinningMove(copy, mark) != null) {
+                    if (basic.determineWinningMove(copy, mark) != null && !copy.isWinner(mark.other())) {
                         return new int[]{i, j};
                     }
                 }
@@ -78,18 +80,34 @@ public class SmartStrategy implements Strategy {
      */
     @Override
     public int[] determineMove(Board board, Mark mark) {
-        int[] move = determineWinningMove(board, mark);
+        /*//check if we can win in 1 move
+        int[] move = basic.determineWinningMove(board, mark);
         if (move != null) {
             return move;
         }
 
-        //else, make sure the opponent cannot win
+        //then check if the opponent can win in 1 move
+        move = basic.determineWinningMove(board, mark.other());
+        if (move != null) {
+            //prevent it by using basic strategy
+            return basic.determineMove(board, mark);
+        }*/
+
+
+
+        //now check if we can find a win in 2 moves
+        int[] move = determineWinningMove(board, mark);
+        if (move != null) {
+                return move;
+            }
+
+        //else, make sure the opponent cannot win in 2 moves
         for (int i = 0; board.isField(i); i++) {
             for (int j = 0; j < 8; j++) {
                 GameBoard copy = (GameBoard) board.deepCopy();
                 if (copy.getField(i) == Mark.EMPTY) {
                     copy.setField(i, mark);
-                    if (j % 2 == 0) { //rotate to the left if j is uneven
+                    if (j % 2 == 0) { //rotate to the left if j is even
                         copy.rotateLeft(j / 2);
                     } else { //else, rotate to the right
                         copy.rotateRight(j / 2);
